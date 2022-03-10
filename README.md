@@ -3,6 +3,7 @@
 Ce projet, dit frontend, est connecté à un service API backend que vous devez aussi lancer en local.
 
 Le projet backend se trouve ici: https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-back
+Le projet Frontend se trouve ici : https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-Front
 
 ## Organiser son espace de travail :
 Pour une bonne organization, vous pouvez créer un dossier bill-app dans lequel vous allez cloner le projet backend et par la suite, le projet frontend:
