@@ -25,17 +25,12 @@ export default class Login {
     }
     this.localStorage.setItem("user", JSON.stringify(user))
     const userExists = this.checkIfUserExists(user)
-    this.login(user)
-      .catch(
-        (err) => this.createUser(user, err)// read "err" by adding it
-      )
-      .then(() => {
-        this.onNavigate(ROUTES_PATH['Bills'])
-        this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
-        PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-        this.document.body.style.backgroundColor="#fff"
-      })
-
+    if (!userExists) this.createUser(user)
+    e.preventDefault()
+    this.onNavigate(ROUTES_PATH['Bills'])
+    this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
+    PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+    this.document.body.style.backgroundColor="#fff"
   }
 
   handleSubmitAdmin = e => {
@@ -47,22 +42,18 @@ export default class Login {
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
-    this.login(user)
-      .catch(
-        (err) => this.createUser(user, err)// read "err" by adding it
-      )
-      .then(() => {
-        this.onNavigate(ROUTES_PATH['Dashboard'])
-        this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
-        PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-        document.body.style.backgroundColor="#fff"
-      })
+    const userExists = this.checkIfUserExists(user)
+    if (!userExists) this.createUser(user)
+    e.preventDefault()
+    this.onNavigate(ROUTES_PATH['Dashboard'])
+    PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+    this.document.body.style.backgroundColor="#fff"
   }
 
   // not need to cover this function by tests
   checkIfUserExists = (user) => {
-    if (this.store) {
-      this.store
+    if (this.firestore) {
+      this.firestore
       .user(user.email)
       .get()
       .then((doc) => {
@@ -82,18 +73,19 @@ export default class Login {
   // not need to cover this function by tests
   createUser = (user) => {
     if (this.firestore) {
-      return this.firestore
+      this.firestore
       .users()
-      .create({data:JSON.stringify({
+      .doc(user.email)
+      .set({
         type: user.type,
         name: user.email.split('@')[0],
         email: user.email,
         password: user.password,
-      })})
+      })
       .then(() => {
         console.log(`User with ${user.email} is created`)
-        return this.login(user)
       })
+      .catch(error => error)
     } else {
       return null
     }

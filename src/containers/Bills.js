@@ -3,10 +3,10 @@ import { formatDate, formatStatus } from "../app/format.js"
 import Logout from "./Logout.js"
 
 export default class {
-  constructor({ document, onNavigate, store, localStorage }) {
+  constructor({ document, onNavigate, firestore, localStorage }) {
     this.document = document
     this.onNavigate = onNavigate
-    this.store = store
+    this.firestore = firestore
     const buttonNewBill = document.querySelector(`button[data-testid="btn-new-bill"]`)
     if (buttonNewBill) buttonNewBill.addEventListener('click', this.handleClickNewBill)
     const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`)
@@ -16,7 +16,7 @@ export default class {
     new Logout({ document, localStorage, onNavigate })
   }
 
-  handleClickNewBill = () => {
+  handleClickNewBill = e => {
     this.onNavigate(ROUTES_PATH['NewBill'])
   }
 
@@ -28,29 +28,29 @@ export default class {
   }
 
   getBills = () => {
-    const userEmail = localStorage.getItem('user') ?
-      JSON.parse(localStorage.getItem('user')).email : ""
-    if (this.store) {
-      return this.store
+   // const userEmail = localStorage.getItem('user') ?
+      //JSON.parse(localStorage.getItem('user')).email : ""
+    if (this.firestore) {
+      return this.firestore
       .bills()
-      .list()
+      .get()
       .then(snapshot => {
-        const bills = snapshot
+        const bills = snapshot.docs
           .map(doc => {
             try {
               return {
-                ...doc,
-                date: formatDate(doc.date),
-                status: formatStatus(doc.status)
+                ...doc.data(),
+                date: formatDate(doc.data().date),
+                status: formatStatus(doc.data().status)
               }
             } catch(e) {
               // if for some reason, corrupted data was introduced, we manage here failing formatDate function
               // log the error and return unformatted date in that case
-              console.log(e,'for',doc)
+              console.log(e,'for',doc.data())
               return {
-                ...doc,
-                date: doc.date,
-                status: formatStatus(doc.status)
+                ...doc.data(),
+                date: doc.data().date,
+                status: formatStatus(doc.data().status)
               }
             }
           })
@@ -58,6 +58,7 @@ export default class {
           console.log('length', bills.length)
         return bills
       })
+      .catch(error => error)
     }
   }
 }
