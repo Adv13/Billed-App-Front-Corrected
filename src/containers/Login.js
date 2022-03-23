@@ -24,9 +24,10 @@ export default class Login {
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
+    const userExists = this.checkIfUserExists(user)
     this.login(user)
       .catch(
-        (err) => this.createUser(user)
+        (err) => this.createUser(user, err)// read "err" by adding it
       )
       .then(() => {
         this.onNavigate(ROUTES_PATH['Bills'])
@@ -48,7 +49,7 @@ export default class Login {
     this.localStorage.setItem("user", JSON.stringify(user))
     this.login(user)
       .catch(
-        (err) => this.createUser(user)
+        (err) => this.createUser(user, err)// read "err" by adding it
       )
       .then(() => {
         this.onNavigate(ROUTES_PATH['Dashboard'])
@@ -59,15 +60,20 @@ export default class Login {
   }
 
   // not need to cover this function by tests
-  login = (user) => {
+  checkIfUserExists = (user) => {
     if (this.store) {
-      return this.store
-      .login(JSON.stringify({
-        email: user.email,
-        password: user.password,
-      })).then(({jwt}) => {
-        localStorage.setItem('jwt', jwt)
+      this.store
+      .user(user.email)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          console.log(`User with ${user.email} exists`)
+          return true
+        } else {
+          return false
+        }
       })
+      .catch(error => error)
     } else {
       return null
     }
@@ -75,8 +81,8 @@ export default class Login {
 
   // not need to cover this function by tests
   createUser = (user) => {
-    if (this.store) {
-      return this.store
+    if (this.firestore) {
+      return this.firestore
       .users()
       .create({data:JSON.stringify({
         type: user.type,
