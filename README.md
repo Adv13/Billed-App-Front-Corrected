@@ -1,3 +1,6 @@
+## Projet 9 - Billed-app - Openclassrooms
+
+Voici le projet 9 de débuggage/test d'un SASS RH permettant de gérer les factures et remboursements d'employés via le service RH.
 
 ## L'architecture du projet :
 Ce projet, dit frontend, est connecté à un service API backend que vous devez aussi lancer en local.
