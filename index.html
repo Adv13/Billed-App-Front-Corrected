@@ -49,23 +49,28 @@
       Router()
     </script>
     <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-storage.js"></script>
-    <!-- Add Firebase products that you want to use -->
-    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-firestore.js"></script>
-    <script>
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.9/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.9/firebase-analytics.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+    
       // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
       const firebaseConfig = {
-        apiKey: "AIzaSyA7Q8lSz_vOi1A79HLdJ5flsEVVLSGsP5w",
-        authDomain: "billable-677b6.firebaseapp.com",
-        databaseURL: "https://billable-677b6.firebaseio.com",
-        projectId: "billable-677b6",
-        storageBucket: "billable-677b6.appspot.com",
-        messagingSenderId: "267055787680",
-        appId: "1:267055787680:web:cef6e306cb63a278f7e3c5"
-      }
+        apiKey: "AIzaSyBOcHK7Iglo7qX2KnqCLce5h1r2YUDF7AI",
+        authDomain: "billed-app-675d8.firebaseapp.com",
+        projectId: "billed-app-675d8",
+        storageBucket: "billed-app-675d8.appspot.com",
+        messagingSenderId: "467624976811",
+        appId: "1:467624976811:web:a61b9a187283b4938fb2ee",
+        measurementId: "G-XWZT76XMJ9"
+      };
+    
       // Initialize Firebase
-      window.firebase.initializeApp(firebaseConfig)
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
     </script>
     <!-- Old method 
     <script type="module">

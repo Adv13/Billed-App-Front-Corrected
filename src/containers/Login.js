@@ -1,4 +1,3 @@
-
 import { ROUTES_PATH } from '../constants/routes.js'
 export let PREVIOUS_LOCATION = ''
 
@@ -16,7 +15,6 @@ export default class Login {
     formAdmin.addEventListener("submit", this.handleSubmitAdmin)
   }
   handleSubmitEmployee = e => {
-    e.preventDefault()
     const user = {
       type: "Employee",
       email: e.target.querySelector(`input[data-testid="employee-email-input"]`).value,
@@ -31,14 +29,14 @@ export default class Login {
     this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
     PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
     this.document.body.style.backgroundColor="#fff"
+
   }
 
   handleSubmitAdmin = e => {
-    e.preventDefault()
     const user = {
       type: "Admin",
-      email: e.target.querySelector(`input[data-testid="admin-email-input"]`).value,/*ici, la queryselector récupérait la valeur "employee-email-input" pour l'input email au lieu de la valeur "admin-email-input"*/
-      password: e.target.querySelector(`input[data-testid="admin-password-input"]`).value,/*ici, la queryselector récupérait la valeur "employee-password-input" pour l'input password au lieu de la valeur "admin-password-input"*/
+      email: e.target.querySelector(`input[data-testid="admin-email-input"]`).value,
+      password: e.target.querySelector(`input[data-testid="admin-password-input"]`).value,
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
@@ -46,16 +44,17 @@ export default class Login {
     if (!userExists) this.createUser(user)
     e.preventDefault()
     this.onNavigate(ROUTES_PATH['Dashboard'])
+    this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
     PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-    this.document.body.style.backgroundColor="#fff"
+    document.body.style.backgroundColor="#fff"
   }
 
   // not need to cover this function by tests
   checkIfUserExists = (user) => {
-    if (this.firestore) {
-      this.firestore
+    if (this.store) {
+      this.store
       .user(user.email)
-      .get()
+      .list()
       .then((doc) => {
         if (doc.exists) {
           console.log(`User with ${user.email} exists`)
@@ -72,20 +71,19 @@ export default class Login {
 
   // not need to cover this function by tests
   createUser = (user) => {
-    if (this.firestore) {
-      this.firestore
+    if (this.store) {
+      return this.store
       .users()
-      .doc(user.email)
-      .set({
+      .create({data:JSON.stringify({
         type: user.type,
         name: user.email.split('@')[0],
         email: user.email,
         password: user.password,
-      })
+      })})
       .then(() => {
         console.log(`User with ${user.email} is created`)
+        return this.login(user)
       })
-      .catch(error => error)
     } else {
       return null
     }

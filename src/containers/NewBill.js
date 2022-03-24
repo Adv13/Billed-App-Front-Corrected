@@ -2,32 +2,43 @@ import { ROUTES_PATH } from '../constants/routes.js'
 import Logout from "./Logout.js"
 
 export default class NewBill {
-  constructor({ document, onNavigate, firestore, localStorage }) {
+  constructor({ document, onNavigate, store, localStorage }) {
     this.document = document
     this.onNavigate = onNavigate
-    this.firestore = firestore
+    this.store = store
     const formNewBill = this.document.querySelector(`form[data-testid="form-new-bill"]`)
     formNewBill.addEventListener("submit", this.handleSubmit)
     const file = this.document.querySelector(`input[data-testid="file"]`)
     file.addEventListener("change", this.handleChangeFile)
     this.fileUrl = null
     this.fileName = null
+    this.billId = null
     new Logout({ document, localStorage, onNavigate })
   }
   handleChangeFile = e => {
+    e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    /* la modal doit afficher l'image et, dans le dashboard, le formulaire correspondant au ticket doit afficher le nom du fichier */
-    this.firestore
-      .storage
-      .ref(`justificatifs/${fileName}`)
-      .put(file)
-      .then(snapshot => snapshot.ref.getDownloadURL())
-      .then(url => {
-        this.fileUrl = url
-        this.fileName = fileName
+    const formData = new FormData()
+    const email = JSON.parse(localStorage.getItem("user")).email
+    formData.append('file', file)
+    formData.append('email', email)
+
+    this.store
+      .bills()
+      .create({
+        data: formData,
+        headers: {
+          noContentType: true
+        }
       })
+      .then(({fileUrl, key}) => {
+        console.log(fileUrl)
+        this.billId = key
+        this.fileUrl = fileUrl
+        this.fileName = fileName
+      }).catch(error => console.error(error))
   }
   handleSubmit = e => {
     e.preventDefault()
@@ -46,16 +57,16 @@ export default class NewBill {
       fileName: this.fileName,
       status: 'pending'
     }
-    this.createBill(bill)
+    this.updateBill(bill)
     this.onNavigate(ROUTES_PATH['Bills'])
   }
 
   // not need to cover this function by tests
-  createBill = (bill) => {
-    if (this.firestore) {
-      this.firestore
+  updateBill = (bill) => {
+    if (this.store) {
+      this.store
       .bills()
-      .add(bill)
+      .update({data: JSON.stringify(bill), selector: this.billId})
       .then(() => {
         this.onNavigate(ROUTES_PATH['Bills'])
       })
