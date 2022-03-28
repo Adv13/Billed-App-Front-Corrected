@@ -49,6 +49,7 @@ mot de passe : admin
 ```
 utilisateur : employee@test.tld
 mot de passe : employee
+```
 
 ### étape 2 - Lancer le frontend :
 
