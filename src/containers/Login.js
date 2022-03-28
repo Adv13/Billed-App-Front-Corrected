@@ -1,3 +1,4 @@
+
 import { ROUTES_PATH } from '../constants/routes.js'
 export let PREVIOUS_LOCATION = ''
 
@@ -15,6 +16,7 @@ export default class Login {
     formAdmin.addEventListener("submit", this.handleSubmitAdmin)
   }
   handleSubmitEmployee = e => {
+    e.preventDefault()
     const user = {
       type: "Employee",
       email: e.target.querySelector(`input[data-testid="employee-email-input"]`).value,
@@ -22,48 +24,50 @@ export default class Login {
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
-    const userExists = this.checkIfUserExists(user)
-    if (!userExists) this.createUser(user)
-    e.preventDefault()
-    this.onNavigate(ROUTES_PATH['Bills'])
-    this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
-    PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-    this.document.body.style.backgroundColor="#fff"
+    this.login(user)
+      .catch(
+        (err) => this.createUser(user, err)
+      )
+      .then(() => {
+        this.onNavigate(ROUTES_PATH['Bills'])
+        this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
+        PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+        this.document.body.style.backgroundColor="#fff"
+      })
 
   }
 
   handleSubmitAdmin = e => {
+    e.preventDefault()
     const user = {
       type: "Admin",
-      email: e.target.querySelector(`input[data-testid="admin-email-input"]`).value,
-      password: e.target.querySelector(`input[data-testid="admin-password-input"]`).value,
+      email: e.target.querySelector(`input[data-testid="admin-email-input"]`).value,/*ici, la queryselector récupérait la valeur "employee-email-input" pour l'input email au lieu de la valeur "admin-email-input"*/
+      password: e.target.querySelector(`input[data-testid="admin-password-input"]`).value,/*ici, la queryselector récupérait la valeur "employee-password-input" pour l'input password au lieu de la valeur "admin-password-input"*/
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
-    const userExists = this.checkIfUserExists(user)
-    if (!userExists) this.createUser(user)
-    e.preventDefault()
-    this.onNavigate(ROUTES_PATH['Dashboard'])
-    this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
-    PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-    document.body.style.backgroundColor="#fff"
+    this.login(user)
+      .catch(
+        (err) => this.createUser(user, err)
+      )
+      .then(() => {
+        this.onNavigate(ROUTES_PATH['Dashboard'])
+        this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
+        PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+        document.body.style.backgroundColor="#fff"
+      })
   }
 
   // not need to cover this function by tests
-  checkIfUserExists = (user) => {
+  login = (user) => {
     if (this.store) {
-      this.store
-      .user(user.email)
-      .list()
-      .then((doc) => {
-        if (doc.exists) {
-          console.log(`User with ${user.email} exists`)
-          return true
-        } else {
-          return false
-        }
+      return this.store
+      .login(JSON.stringify({
+        email: user.email,
+        password: user.password,
+      })).then(({jwt}) => {
+        localStorage.setItem('jwt', jwt)
       })
-      .catch(error => error)
     } else {
       return null
     }
