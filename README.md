@@ -14,7 +14,7 @@ Clonez le projet backend dans le dossier bill-app :
 
 ## Comment lancer l'application en local ?
 
-### étape 1 - Lancer le backend :
+### Etape 1 - Lancer le backend :
 
 
 #### Acceder au repertoire du projet :
@@ -51,7 +51,7 @@ utilisateur : employee@test.tld
 mot de passe : employee
 ```
 
-### étape 2 - Lancer le frontend :
+### Etape 2 - Lancer le frontend :
 
 Allez au repo cloné :
 ```
@@ -94,18 +94,3 @@ $jest src/__tests__/your_test_file.js
 ## Comment voir la couverture de test ?
 
 `http://127.0.0.1:8080/coverage/lcov-report/`
-
-## Comptes et utilisateurs :
-
-Vous pouvez vous connecter en utilisant les comptes:
-
-### administrateur : 
-```
-utilisateur : admin@test.tld 
-mot de passe : admin
-```
-### employé :
-```
-utilisateur : employee@test.tld
-mot de passe : employee
-```
