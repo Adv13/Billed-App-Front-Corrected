@@ -31,28 +31,60 @@ bill-app/
 
 ## Comment lancer l'application en local ?
 
-### étape 1 - Lancer le backend :
+### Etape 1 - Lancer le backend :
 
-Suivez les indications dans le README du projet backend.
+#### Acceder au repertoire du projet :
+```
+cd Billed-app-FR-Back
+```
 
-### étape 2 - Lancer le frontend :
+#### Installer les dépendances du projet :
 
-Allez au repo cloné :
+```
+npm install
+```
+
+#### Lancer l'API :
+
+```
+npm run run:dev
+```
+
+### Accéder à l'API :
+
+L'api est accessible sur le port `5678` en local, c'est à dire `http://localhost:5678`
+
+## Utilisateurs par défaut:
+
+### administrateur : 
+```
+utilisateur : admin@test.tld 
+mot de passe : admin
+```
+### employé :
+```
+utilisateur : employee@test.tld
+mot de passe : employee
+```
+
+### Etape 2 - Lancer le frontend :
+
+#### Allez au repo cloné :
 ```
 $ cd Billed-app-FR-Front
 ```
 
-Installez les packages npm (décrits dans `package.json`) :
+#### Installez les packages npm (décrits dans `package.json`) :
 ```
 $ npm install
 ```
 
-Installez live-server pour lancer un serveur local :
+#### Installez live-server pour lancer un serveur local :
 ```
 $ npm install -g live-server
 ```
 
-Lancez l'application :
+#### Lancez l'application :
 ```
 $ live-server
 ```
@@ -78,18 +110,3 @@ $jest src/__tests__/your_test_file.js
 ## Comment voir la couverture de test ?
 
 `http://127.0.0.1:8080/coverage/lcov-report/`
-
-## Comptes et utilisateurs :
-
-Vous pouvez vous connecter en utilisant les comptes:
-
-### administrateur : 
-```
-utilisateur : admin@test.tld 
-mot de passe : admin
-```
-### employé :
-```
-utilisateur : employee@test.tld
-mot de passe : employee
-```
