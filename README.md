@@ -53,22 +53,22 @@ mot de passe : employee
 
 ### Etape 2 - Lancer le frontend :
 
-Allez au repo cloné :
+#### Allez au repo cloné :
 ```
 $ cd Billed-app-FR-Front
 ```
 
-Installez les packages npm (décrits dans `package.json`) :
+#### Installez les packages npm (décrits dans `package.json`) :
 ```
 $ npm install
 ```
 
-Installez live-server pour lancer un serveur local :
+#### Installez live-server pour lancer un serveur local :
 ```
 $ npm install -g live-server
 ```
 
-Lancez l'application :
+#### Lancez l'application :
 ```
 $ live-server
 ```
