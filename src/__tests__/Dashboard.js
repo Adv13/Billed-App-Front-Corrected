@@ -5,7 +5,7 @@ import DashboardUI from "../views/DashboardUI.js"
 import Dashboard, { filteredBills, cards } from "../containers/Dashboard.js"
 import { ROUTES } from "../constants/routes"
 import { localStorageMock } from "../__mocks__/localStorage.js"
-import firebase from "../__mocks__/firebase"
+import store from "../__mocks__/store"
 import { bills } from "../fixtures/bills"
 
 
@@ -93,7 +93,7 @@ describe('Given I am connected as an Admin', () => {
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
-
+      // modifie le localStorage par le localStorageMock
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Admin'
@@ -240,13 +240,13 @@ describe('Given I am connected as Admin and I am on Dashboard page and I clicked
 describe("Given I am a user connected as Admin", () => {
   describe("When I navigate to Dashboard", () => {
     test("fetches bills from mock API GET", async () => {
-       const getSpy = jest.spyOn(firebase, "get")
-       const bills = await firebase.get()
+       const getSpy = jest.spyOn(store, "get")//fonction simulée qui  surveille l'appel de la méthode get de l'objet store
+       const bills = await store.get()
        expect(getSpy).toHaveBeenCalledTimes(1)
        expect(bills.data.length).toBe(4)
     })
     test("fetches bills from an API and fails with 404 message error", async () => {
-      firebase.get.mockImplementationOnce(() =>
+      store.get.mockImplementationOnce(() =>// simule un rejet de la promesse
         Promise.reject(new Error("Erreur 404"))
       )
       const html = DashboardUI({ error: "Erreur 404" })
@@ -255,7 +255,7 @@ describe("Given I am a user connected as Admin", () => {
       expect(message).toBeTruthy()
     })
     test("fetches messages from an API and fails with 500 message error", async () => {
-      firebase.get.mockImplementationOnce(() =>
+      store.get.mockImplementationOnce(() =>
         Promise.reject(new Error("Erreur 500"))
       )
       const html = DashboardUI({ error: "Erreur 500" })

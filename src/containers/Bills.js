@@ -1,6 +1,7 @@
 import { ROUTES_PATH } from '../constants/routes.js'
 import { formatDate, formatStatus } from "../app/format.js"
 import Logout from "./Logout.js"
+import "../__mocks__/store.js";
 
 export default class {
   constructor({ document, onNavigate, firestore, localStorage }) {
@@ -28,18 +29,19 @@ export default class {
   }
 
   // not need to cover this function by tests
+  // istanbul ignore next
   getBills = () => {
     if (this.firestore) {
       return this.firestore
       .bills()
-      .get()
+      .list()
       .then(snapshot => {
         const bills = snapshot
           .map(doc => {
             try {
               return {
                 ...doc,
-                date: formatDate(doc.date),
+                //date: formatDate(doc.date),
                 status: formatStatus(doc.status)
               }
             } catch(e) {
@@ -56,6 +58,7 @@ export default class {
           console.log('length', bills.length)
         return bills
       })
+      .catch(error => error)
     }
   }
 }

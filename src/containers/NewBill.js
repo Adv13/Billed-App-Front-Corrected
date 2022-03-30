@@ -1,5 +1,6 @@
 import { ROUTES_PATH } from '../constants/routes.js'
 import Logout from "./Logout.js"
+import {localStorageMock} from '../__mocks__/localStorage.js'
 
 export default class NewBill {
   constructor({ document, onNavigate, firestore, localStorage }) {
@@ -18,28 +19,40 @@ export default class NewBill {
   handleChangeFile = e => {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+    console.log('file', file);//afficher dans la console
     const filePath = e.target.value.split(/\\/g)
+    console.log('file' , filePath);
     const fileName = filePath[filePath.length-1]
-    const formData = new FormData()
-    const email = JSON.parse(localStorage.getItem("user")).email
-    formData.append('file', file)
-    formData.append('email', email)
+    console.log('filename' , fileName);
+    const formData = new FormData()// créé un nouvel objet "form" vide
+    console.log('formData', formData);
+    const email = JSON.parse(localStorage.getItem("user")).email//récupère l'email
+    console.log('email' , email);
+    formData.append('file', file)//ajoute une clef valeur à formData
+    formData.append('email', email)//ajoute une clef valeur à formData
 
-    this.firestore
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true
-        }
-      })
-      .then(({fileUrl, key}) => {
-        console.log(fileUrl)
-        this.billId = key
-        this.fileUrl = fileUrl
-        this.fileName = fileName
-      }).catch(error => console.error(error))
+    // test du format de l'image
+    if(fileName.endsWith('jpg'|| 'jpeg' || 'png')){      
+      this.store 
+        .bills()
+        .create({
+          data: formData,
+          headers: {
+            noContentType: true
+          }
+        })
+        .then(({fileUrl, key}) => {
+          console.log(fileUrl)
+          this.billId = key
+          this.fileUrl = fileUrl
+          this.fileName = fileName
+        }).catch(error => console.error(error))
+    }else{
+      alert('Format non supporté. Veuillez sélectionner un média au format .jpg , .jpeg ou .png.' )
+      return
+    }
   }
+
   handleSubmit = e => {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
@@ -62,6 +75,7 @@ export default class NewBill {
   }
 
   // not need to cover this function by tests
+  //istanbul ignore next
   updateBill = (bill) => {
     if (this.firestore) {
       this.firestore

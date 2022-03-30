@@ -46,24 +46,24 @@
       import firestore from "./src/app/Firestore.js"
       Router()
     </script>
-    <script type="module">
-      // Import the functions you need from the SDKs you need
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
-    
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-storage.js"></script>
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-firestore.js"></script>
+    <script>
       // Your web app's Firebase configuration
       const firebaseConfig = {
-        apiKey: "AIzaSyBjFAyS1uzi4BM_kLELpMsy7oCHPKrZY-E",
-        authDomain: "p9-billed-app-project.firebaseapp.com",
-        projectId: "p9-billed-app-project",
-        storageBucket: "p9-billed-app-project.appspot.com",
-        messagingSenderId: "424323377473",
-        appId: "1:424323377473:web:16e95b74a20290240d59c0"
-      };
-    
+        apiKey: "AIzaSyA7Q8lSz_vOi1A79HLdJ5flsEVVLSGsP5w",
+        authDomain: "billable-677b6.firebaseapp.com",
+        databaseURL: "https://billable-677b6.firebaseio.com",
+        projectId: "billable-677b6",
+        storageBucket: "billable-677b6.appspot.com",
+        messagingSenderId: "267055787680",
+        appId: "1:267055787680:web:cef6e306cb63a278f7e3c5"
+      }
       // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
+      window.firebase.initializeApp(firebaseConfig)
     </script>
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

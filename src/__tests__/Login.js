@@ -84,14 +84,14 @@
  
        let PREVIOUS_LOCATION = "";
  
-       const firebase = jest.fn();
+       const store = jest.fn();
  
        const login = new Login({
          document,
          localStorage: window.localStorage,
          onNavigate,
          PREVIOUS_LOCATION,
-         firebase,
+         store,
        });
  
        const handleSubmit = jest.fn(login.handleSubmitEmployee);
@@ -196,14 +196,14 @@
  
        let PREVIOUS_LOCATION = "";
  
-       const firebase = jest.fn();
+       const store = jest.fn();
  
        const login = new Login({
          document,
          localStorage: window.localStorage,
          onNavigate,
          PREVIOUS_LOCATION,
-         firebase,
+         store,
        });
  
        const handleSubmit = jest.fn(login.handleSubmitAdmin);

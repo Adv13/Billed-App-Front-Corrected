@@ -48,6 +48,16 @@ export default ({ data: bills, loading, error }) => {
     return ErrorPage(error)
   }
   
+  //pour afficher les factures en ordre décroissant
+  let sortedBills 
+  if (bills) {
+    sortedBills = [...bills].sort((a, b) => new Date(b.date) - new Date(a.date))
+  }
+
+  bills.forEach(element => {
+    console.log(element.date);
+  });
+
   return (`
     <div class='layout'>
       ${VerticalLayout(120)}
@@ -69,7 +79,7 @@ export default ({ data: bills, loading, error }) => {
               </tr>
           </thead>
           <tbody data-testid="tbody">
-            ${rows(bills)}
+            ${rows(sortedBills)}
           </tbody>
           </table>
         </div>
