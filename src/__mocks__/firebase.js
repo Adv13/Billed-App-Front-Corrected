@@ -1,5 +1,5 @@
 export default {
-  get: () => {
+  get() {
     return Promise.resolve({
       data: [{
         "id": "47qAXb6fIm2zOKkLzMro",

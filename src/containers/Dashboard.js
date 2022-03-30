@@ -13,7 +13,9 @@ export const filteredBills = (data, status) => {
       // in jest environment
       if (typeof jest !== 'undefined') {
         selectCondition = (bill.status === status)
-      } else {
+      }
+      /* istanbul ignore next */
+      else {
         // in prod environment
         const userEmail = JSON.parse(localStorage.getItem("user")).email
         selectCondition =
@@ -70,10 +72,10 @@ export default class {
     this.document = document
     this.onNavigate = onNavigate
     this.firestore = firestore
-    $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
-    $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
-    $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
-    this.getBillsAllUsers()
+    $('#arrow-icon1').on((e) => this.handleShowTickets(e, bills, 1))
+    $('#arrow-icon2').on((e) => this.handleShowTickets(e, bills, 2))
+    $('#arrow-icon3').on((e) => this.handleShowTickets(e, bills, 3))
+    //this.getBillsAllUsers()
     new Logout({ localStorage, onNavigate })
     /*bills.forEach(bill => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))*/
@@ -82,7 +84,7 @@ export default class {
   handleClickIconEye = () => {
     const billUrl = $('#icon-eye-d').attr("data-bill-url")
     const imgWidth = Math.floor($('#modaleFileAdmin1').width() * 0.8)
-    $('#modaleFileAdmin1').find(".modal-body").html(`<div style='text-align: center;'><img width=${imgWidth} src=${billUrl} /></div>`)
+    $('#modaleFileAdmin1').find(".modal-body").html(`<div style='text-align: center;'><img width=${imgWidth} src=${billUrl} alt="Bill" /></div>`)
     if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show')
   }
 
@@ -106,9 +108,9 @@ export default class {
       $('.vertical-navbar').css({ height: '120vh' })
       this.counter ++
     }
-    $('#icon-eye-d').click(this.handleClickIconEye)
-    $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
-    $('#btn-refuse-bill').click((e) => this.handleRefuseSubmit(e, bill))
+    $('#icon-eye-d').on(this.handleClickIconEye)
+    $('#btn-accept-bill').on((e) => this.handleAcceptSubmit(e, bill))
+    $('#btn-refuse-bill').on((e) => this.handleRefuseSubmit(e, bill))
   }
 
   handleAcceptSubmit = (e, bill) => {
@@ -147,7 +149,7 @@ export default class {
     }
 
     bills.forEach(bill => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+      $(`#open-bill${bill.id}`).on((e) => this.handleEditTicket(e, bill, bills))
     })
 
     return bills
@@ -159,7 +161,7 @@ export default class {
     if (this.firestore) {
       return this.firestore
       .bills()
-      .list()
+      .get()
       .then(snapshot => {
         const bills = snapshot
         .map(doc => ({
@@ -170,11 +172,14 @@ export default class {
         }))
         return bills
       })
-      .catch(console.log)
+      .catch(error =>{
+        throw error;
+      })
     }
   }
 
   // not need to cover this function by tests
+  /* istanbul ignore next */
   updateBill = (bill) => {
     if (this.firestore) {
     return this.firestore

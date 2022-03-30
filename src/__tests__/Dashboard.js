@@ -30,15 +30,13 @@ describe('Given I am connected as an Admin', () => {
   })
   describe('When I am on Dashboard page but it is loading', () => {
     test('Then, Loading page should be rendered', () => {
-      const html = DashboardUI({ loading: true })
-      document.body.innerHTML = html
+      document.body.innerHTML = DashboardUI({ loading: true })
       expect(screen.getAllByText('Loading...')).toBeTruthy()
     })
   })
   describe('When I am on Dashboard page but back-end send an error message', () => {
     test('Then, Error page should be rendered', () => {
-      const html = DashboardUI({ error: 'some error message' })
-      document.body.innerHTML = html
+      document.body.innerHTML = DashboardUI({ error: 'some error message' })
       expect(screen.getAllByText('Erreur')).toBeTruthy()
     })
   })
@@ -58,9 +56,7 @@ describe('Given I am connected as an Admin', () => {
       const dashboard = new Dashboard({
         document, onNavigate, firestore: null, bills:bills, localStorage: window.localStorage
       })          
-      const html = DashboardUI({ data: {bills} })
-
-      document.body.innerHTML = html
+      document.body.innerHTML = DashboardUI({ data: { bills } })
 
       const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1)) 
       const handleShowTickets2 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 2))    
@@ -104,7 +100,7 @@ describe('Given I am connected as an Admin', () => {
       }))
 
       const dashboard = new Dashboard({
-        document, onNavigate, store: null, bills:bills, localStorage: window.localStorage
+        document, onNavigate, firestore: null, bills:bills, localStorage: window.localStorage
       })
       document.body.innerHTML = DashboardUI({ data: { bills } })
       const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1))
@@ -132,7 +128,7 @@ describe('Given I am connected as an Admin', () => {
       }))
 
       const dashboard = new Dashboard({
-        document, onNavigate, store: null, bills:bills, localStorage: window.localStorage
+        document, onNavigate, firestore: null, bills:bills, localStorage: window.localStorage
       })
       document.body.innerHTML = DashboardUI({ data: { bills } })
 
@@ -152,8 +148,7 @@ describe('Given I am connected as an Admin', () => {
 
   describe('When I am on Dashboard and there are no bills', () => {
     test('Then, no cards should be shown', () => {
-      const html = cards([])
-      document.body.innerHTML = html
+      document.body.innerHTML = cards([])
 
       const iconEdit = screen.queryByTestId('open-bill47qAXb6fIm2zOKkLzMro')
       expect(iconEdit).toBeNull()
