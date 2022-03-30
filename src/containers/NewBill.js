@@ -2,10 +2,10 @@ import { ROUTES_PATH } from '../constants/routes.js'
 import Logout from "./Logout.js"
 
 export default class NewBill {
-  constructor({ document, onNavigate, store, localStorage }) {
+  constructor({ document, onNavigate, firestore, localStorage }) {
     this.document = document
     this.onNavigate = onNavigate
-    this.store = store
+    this.firestore = firestore
     const formNewBill = this.document.querySelector(`form[data-testid="form-new-bill"]`)
     formNewBill.addEventListener("submit", this.handleSubmit)
     const file = this.document.querySelector(`input[data-testid="file"]`)
@@ -25,7 +25,7 @@ export default class NewBill {
     formData.append('file', file)
     formData.append('email', email)
 
-    this.store
+    this.firestore
       .bills()
       .create({
         data: formData,
@@ -63,8 +63,8 @@ export default class NewBill {
 
   // not need to cover this function by tests
   updateBill = (bill) => {
-    if (this.store) {
-      this.store
+    if (this.firestore) {
+      this.firestore
       .bills()
       .update({data: JSON.stringify(bill), selector: this.billId})
       .then(() => {

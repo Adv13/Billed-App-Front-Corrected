@@ -1,15 +1,14 @@
-
 import { ROUTES_PATH } from '../constants/routes.js'
 export let PREVIOUS_LOCATION = ''
 
 // we use a class so as to test its methods in e2e tests
 export default class Login {
-  constructor({ document, localStorage, onNavigate, PREVIOUS_LOCATION, store }) {
+  constructor({ document, localStorage, onNavigate, PREVIOUS_LOCATION, firestore }) {
     this.document = document
     this.localStorage = localStorage
     this.onNavigate = onNavigate
     this.PREVIOUS_LOCATION = PREVIOUS_LOCATION
-    this.store = store
+    this.firestore = firestore
     const formEmployee = this.document.querySelector(`form[data-testid="form-employee"]`)
     formEmployee.addEventListener("submit", this.handleSubmitEmployee)
     const formAdmin = this.document.querySelector(`form[data-testid="form-admin"]`)
@@ -26,7 +25,7 @@ export default class Login {
     this.localStorage.setItem("user", JSON.stringify(user))
     this.login(user)
       .catch(
-        (err) => this.createUser(user, err)
+        (err) => this.createUser(user)
       )
       .then(() => {
         this.onNavigate(ROUTES_PATH['Bills'])
@@ -60,8 +59,8 @@ export default class Login {
 
   // not need to cover this function by tests
   login = (user) => {
-    if (this.store) {
-      return this.store
+    if (this.firestore) {
+      return this.firestore
       .login(JSON.stringify({
         email: user.email,
         password: user.password,
@@ -75,8 +74,8 @@ export default class Login {
 
   // not need to cover this function by tests
   createUser = (user) => {
-    if (this.store) {
-      return this.store
+    if (this.firestore) {
+      return this.firestore
       .users()
       .create({data:JSON.stringify({
         type: user.type,
@@ -92,4 +91,4 @@ export default class Login {
       return null
     }
   }
-}
+} 

@@ -13,9 +13,7 @@ export const filteredBills = (data, status) => {
       // in jest environment
       if (typeof jest !== 'undefined') {
         selectCondition = (bill.status === status)
-      }
-      /* istanbul ignore next */
-      else {
+      } else {
         // in prod environment
         const userEmail = JSON.parse(localStorage.getItem("user")).email
         selectCondition =
@@ -68,20 +66,23 @@ export const getStatus = (index) => {
 }
 
 export default class {
-  constructor({ document, onNavigate, store, bills, localStorage }) {
+  constructor({ document, onNavigate, firestore, bills, localStorage }) {
     this.document = document
     this.onNavigate = onNavigate
-    this.store = store
+    this.firestore = firestore
     $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
     $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
     $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
+    this.getBillsAllUsers()
     new Logout({ localStorage, onNavigate })
+    /*bills.forEach(bill => {
+      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))*/
   }
 
   handleClickIconEye = () => {
     const billUrl = $('#icon-eye-d').attr("data-bill-url")
     const imgWidth = Math.floor($('#modaleFileAdmin1').width() * 0.8)
-    $('#modaleFileAdmin1').find(".modal-body").html(`<div style='text-align: center;'><img width=${imgWidth} src=${billUrl} alt="Bill"/></div>`)
+    $('#modaleFileAdmin1').find(".modal-body").html(`<div style='text-align: center;'><img width=${imgWidth} src=${billUrl} /></div>`)
     if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show')
   }
 
@@ -100,7 +101,7 @@ export default class {
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
       $('.dashboard-right-container div').html(`
-        <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
+        <div id="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({ height: '120vh' })
       this.counter ++
@@ -153,9 +154,10 @@ export default class {
 
   }
 
+  // not need to cover this function by tests
   getBillsAllUsers = () => {
-    if (this.store) {
-      return this.store
+    if (this.firestore) {
+      return this.firestore
       .bills()
       .list()
       .then(snapshot => {
@@ -168,21 +170,18 @@ export default class {
         }))
         return bills
       })
-      .catch(error => {
-        throw error;
-      })
+      .catch(console.log)
     }
   }
 
   // not need to cover this function by tests
-  /* istanbul ignore next */
   updateBill = (bill) => {
-    if (this.store) {
-    return this.store
+    if (this.firestore) {
+    return this.firestore
       .bills()
       .update({data: JSON.stringify(bill), selector: bill.id})
       .then(bill => bill)
       .catch(console.log)
     }
   }
-}
+}//}

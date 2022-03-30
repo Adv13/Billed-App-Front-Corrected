@@ -1,19 +1,13 @@
-/**
- * @jest-environment jsdom
- */
-
-import {fireEvent, screen, waitFor} from "@testing-library/dom"
+import { fireEvent, screen, waitFor } from "@testing-library/dom"
 import userEvent from '@testing-library/user-event'
 import DashboardFormUI from "../views/DashboardFormUI.js"
 import DashboardUI from "../views/DashboardUI.js"
 import Dashboard, { filteredBills, cards } from "../containers/Dashboard.js"
-import { ROUTES, ROUTES_PATH } from "../constants/routes"
+import { ROUTES } from "../constants/routes"
 import { localStorageMock } from "../__mocks__/localStorage.js"
-import mockStore from "../__mocks__/store"
+import firebase from "../__mocks__/firebase"
 import { bills } from "../fixtures/bills"
-import router from "../app/Router"
 
-jest.mock("../app/store", () => mockStore)
 
 describe('Given I am connected as an Admin', () => {
   describe('When I am on Dashboard page, there are bills, and there is one pending', () => {
@@ -36,19 +30,21 @@ describe('Given I am connected as an Admin', () => {
   })
   describe('When I am on Dashboard page but it is loading', () => {
     test('Then, Loading page should be rendered', () => {
-      document.body.innerHTML = DashboardUI({ loading: true })
+      const html = DashboardUI({ loading: true })
+      document.body.innerHTML = html
       expect(screen.getAllByText('Loading...')).toBeTruthy()
     })
   })
   describe('When I am on Dashboard page but back-end send an error message', () => {
     test('Then, Error page should be rendered', () => {
-      document.body.innerHTML = DashboardUI({ error: 'some error message' })
+      const html = DashboardUI({ error: 'some error message' })
+      document.body.innerHTML = html
       expect(screen.getAllByText('Erreur')).toBeTruthy()
     })
   })
 
   describe('When I am on Dashboard page and I click on arrow', () => {
-    test('Then, tickets list should be unfolding, and cards should appear', async () => {
+    test('Then, tickets list should be unfolding, and cards should contain first and lastname', async () => {
 
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
@@ -60,13 +56,15 @@ describe('Given I am connected as an Admin', () => {
       }))
 
       const dashboard = new Dashboard({
-        document, onNavigate, store: null, bills:bills, localStorage: window.localStorage
-      })
-      document.body.innerHTML = DashboardUI({ data: { bills } })
+        document, onNavigate, firestore: null, bills:bills, localStorage: window.localStorage
+      })          
+      const html = DashboardUI({ data: {bills} })
 
-      const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1))
-      const handleShowTickets2 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 2))
-      const handleShowTickets3 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 3))
+      document.body.innerHTML = html
+
+      const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1)) 
+      const handleShowTickets2 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 2))    
+      const handleShowTickets3 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 3))    
 
       const icon1 = screen.getByTestId('arrow-icon1')
       const icon2 = screen.getByTestId('arrow-icon2')
@@ -77,6 +75,7 @@ describe('Given I am connected as an Admin', () => {
       expect(handleShowTickets1).toHaveBeenCalled()
       await waitFor(() => screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`) )
       expect(screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`)).toBeTruthy()
+
       icon2.addEventListener('click', handleShowTickets2)
       userEvent.click(icon2)
       expect(handleShowTickets2).toHaveBeenCalled()
@@ -88,11 +87,12 @@ describe('Given I am connected as an Admin', () => {
       expect(handleShowTickets3).toHaveBeenCalled()
       await waitFor(() => screen.getByTestId(`open-billBeKy5Mo4jkmdfPGYpTxZ`) )
       expect(screen.getByTestId(`open-billBeKy5Mo4jkmdfPGYpTxZ`)).toBeTruthy()
+
     })
   })
 
   describe('When I am on Dashboard page and I click on edit icon of a card', () => {
-    test('Then, right form should be filled',  () => {
+    test('Then, right form should be filled', () => {
 
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
@@ -150,10 +150,11 @@ describe('Given I am connected as an Admin', () => {
     })
   })
 
-
   describe('When I am on Dashboard and there are no bills', () => {
     test('Then, no cards should be shown', () => {
-      document.body.innerHTML = cards([])
+      const html = cards([])
+      document.body.innerHTML = html
+
       const iconEdit = screen.queryByTestId('open-bill47qAXb6fIm2zOKkLzMro')
       expect(iconEdit).toBeNull()
     })
@@ -172,9 +173,9 @@ describe('Given I am connected as Admin, and I am on Dashboard page, and I click
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
-      const store = null
+      const firestore = null
       const dashboard = new Dashboard({
-        document, onNavigate, store, bills, localStorage: window.localStorage
+        document, onNavigate, firestore, bills, localStorage: window.localStorage
       })
 
       const acceptButton = screen.getByTestId("btn-accept-bill-d")
@@ -197,9 +198,9 @@ describe('Given I am connected as Admin, and I am on Dashboard page, and I click
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
-      const store = null
+      const firestore = null
       const dashboard = new Dashboard({
-        document, onNavigate, store, bills, localStorage: window.localStorage
+        document, onNavigate, firestore, bills, localStorage: window.localStorage
       })
       const refuseButton = screen.getByTestId("btn-refuse-bill-d")
       const handleRefuseSubmit = jest.fn((e) => dashboard.handleRefuseSubmit(e, bills[0]))
@@ -223,9 +224,9 @@ describe('Given I am connected as Admin and I am on Dashboard page and I clicked
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
-      const store = null
+      const firestore = null
       const dashboard = new Dashboard({
-        document, onNavigate, store, bills, localStorage: window.localStorage
+        document, onNavigate, firestore, bills, localStorage: window.localStorage
       })
 
       const handleClickIconEye = jest.fn(dashboard.handleClickIconEye)
@@ -241,6 +242,36 @@ describe('Given I am connected as Admin and I am on Dashboard page and I clicked
 })
 
 // test d'intégration GET
+describe("Given I am a user connected as Admin", () => {
+  describe("When I navigate to Dashboard", () => {
+    test("fetches bills from mock API GET", async () => {
+       const getSpy = jest.spyOn(firebase, "get")
+       const bills = await firebase.get()
+       expect(getSpy).toHaveBeenCalledTimes(1)
+       expect(bills.data.length).toBe(4)
+    })
+    test("fetches bills from an API and fails with 404 message error", async () => {
+      firebase.get.mockImplementationOnce(() =>
+        Promise.reject(new Error("Erreur 404"))
+      )
+      const html = DashboardUI({ error: "Erreur 404" })
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 404/)
+      expect(message).toBeTruthy()
+    })
+    test("fetches messages from an API and fails with 500 message error", async () => {
+      firebase.get.mockImplementationOnce(() =>
+        Promise.reject(new Error("Erreur 500"))
+      )
+      const html = DashboardUI({ error: "Erreur 500" })
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 500/)
+      expect(message).toBeTruthy()
+    })
+  })
+})
+
+/*// test d'intégration GET
 describe("Given I am a user connected as Admin", () => {
   describe("When I navigate to Dashboard", () => {
     test("fetches bills from mock API GET", async () => {
@@ -302,8 +333,4 @@ describe("Given I am a user connected as Admin", () => {
       const message = await screen.getByText(/Erreur 500/)
       expect(message).toBeTruthy()
     })
-  })
-
-  })
-})
-
+  })*/
