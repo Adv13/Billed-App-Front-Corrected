@@ -26,7 +26,7 @@ export default class Login {
     this.login(user)
     
       .catch(
-        (err) => this.createUser(user)
+        (err) => this.createUser(user, err)
       )
       .then(() => {
         this.onNavigate(ROUTES_PATH['Bills'])

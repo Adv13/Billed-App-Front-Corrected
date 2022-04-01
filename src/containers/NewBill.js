@@ -15,7 +15,7 @@ export default class NewBill {
     this.fileName = null
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
-    this.validFormat = null
+    this.validFormat = null//A enlever pour simuler format refusé et afficher l'alerte
   }
   handleChangeFile = e => {
     console.log('ok from containers NewBill.js');
@@ -33,12 +33,12 @@ export default class NewBill {
     formData.append('file', file)//ajoute une clef valeur à formData
     formData.append('email', email)//ajoute une clef valeur à formData
 
-    this.validFormat = true   // défini que le format est valide
+    this.validFormat = true   // défini que le format est valide. A enlever pour simuler format refusé et afficher l'alerte
 
       // test du format de l'image
       if ( /\.(jpe?g|png)$/i.test(fileName) ){  
-        this.validFormat= true  // vérifie l'extension du fichier        
-          this.store 
+        this.validFormat= true  // vérifie l'extension du fichier. A enlever pour simuler format refusé et afficher l'alerte        
+          this.firestore 
             .bills()
             .create({
               data: formData,
@@ -53,7 +53,7 @@ export default class NewBill {
             }).catch(error => console.error(error))
     }else{
       alert('Format non supporté. Veuillez sélectionner un média au format .jpg , .jpeg ou .png uniquement.' ) // format non valide alert un mesg
-      this.validFormat = false // défini que le format est invalide
+      this.validFormat = false // défini que le format est invalide. A enlever pour simuler format refusé et afficher l'alerte
       console.log(validFormat);
       return 
     }
