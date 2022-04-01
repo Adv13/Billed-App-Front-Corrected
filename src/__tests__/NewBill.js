@@ -10,6 +10,7 @@ import {localStorageMock } from '../__mocks__/localStorage.js'
 import {ROUTES , ROUTES_PATH} from '../constants/routes.js'
 import Router from "../app/Router.js"//added
 import store from "../__mocks__/store.js"//added
+import BillsUI from '../views/BillsUI.js'
 
 
 describe("Given I am connected as an employee", () => {
@@ -85,7 +86,7 @@ describe("When I select a file", () => {
       onNavigate: (pathname) => document.body.innerHTML = ROUTES({ pathname }),
       firestore: null,
       localStorage: window.localStorage,
-      validFormat : true
+      validFormat : true,
     })     
 
 

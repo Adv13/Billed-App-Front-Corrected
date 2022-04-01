@@ -5,9 +5,10 @@ import'@testing-library/jest-dom'
 import {screen, waitFor, fireEvent} from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
-import {ROUTES_PATH} from "../constants/routes.js";
+import {ROUTES, ROUTES_PATH} from "../constants/routes.js";
 import store from "../__mocks__/store.js"
 import Router from "../app/Router.js";
+import Bills from '../containers/Bills.js';
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -15,7 +16,7 @@ describe("Given I am connected as an employee", () => {
       //to-do write expect expression done
       window.localStorage.setItem('user', JSON.stringify({type: 'Employee'}))// défini le user en tant qu'employé dans le local storage
       Object.defineProperty(window, "location", { value: { hash: ROUTES_PATH['Bills'] } });// défini l'url comme étant '#employee/bills'
-      document.body.innerHTML = `<div id="root"></div>` // crée le noeud pour que le router injecte l'objet correspondant à l'url
+      document.body.innerHTML = `<div id="root"></div>` // créé le noeud pour que le router injecte l'objet correspondant à l'url
       Router();// lance le router
       expect(screen.getByTestId('icon-window').classList.contains('active-icon')).toBe(true) // vérifie si l'icone est en surbrillance
 
@@ -49,7 +50,7 @@ describe('Given i am on error page', () => {
 
 //Bill tests
 
-describe('Given i am on bills page',()=>{
+describe('Given I am on bills page',()=>{
     //methode handleClickNewBill
     test('Should called the handleClickNewBill method when i click on newBill button',()=>{  
       window.localStorage.setItem('user', JSON.stringify({type: 'Employee'}))

@@ -29,7 +29,7 @@ export default class {
   }
 
   // not need to cover this function by tests
-  // istanbul ignore next
+  /* istanbul ignore next */
   getBills = () => {
     if (this.firestore) {
       return this.firestore
