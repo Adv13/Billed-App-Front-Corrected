@@ -117,3 +117,6 @@
   cursor: pointer;
 }
 
+.vertical-navbar{
+  position:fixed;
+}

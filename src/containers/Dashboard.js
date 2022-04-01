@@ -5,6 +5,13 @@ import { ROUTES_PATH } from '../constants/routes.js'
 import USERS_TEST from '../constants/usersTest.js'
 import Logout from "./Logout.js"
 
+/**
+ * 
+ * @param {Object} data données a traiter 
+ * @param {string} status status de la note de frais
+ * @returns 
+ */
+
 export const filteredBills = (data, status) => {
   return (data && data.length) ?
     data.filter(bill => {
@@ -26,6 +33,12 @@ export const filteredBills = (data, status) => {
       return selectCondition
     }) : []
 }
+
+/**
+ * 
+ * @param {Object} bill note de frais à afficher
+ * @returns 
+ */
 
 export const card = (bill) => {
   const firstAndLastNames = bill.email.split('@')[0]
@@ -52,6 +65,12 @@ export const card = (bill) => {
   `)
 }
 
+/**
+ * 
+ * @param {Object} bills tableau d'objets à afficher
+ * @returns 
+ */
+
 export const cards = (bills) => {
   return bills && bills.length ? bills.map(bill => card(bill)).join("") : ""
 }
@@ -72,7 +91,7 @@ export default class {
     this.document = document
     this.onNavigate = onNavigate
     this.firestore = firestore
-    $('#arrow-icon1').on((e) => this.handleShowTickets(e, bills, 1))
+    $('#arrow-icon1').on((e) => this.handleShowTickets(e, bills, 1))// lance la méthode handleShowTicket au click sur la flèche
     $('#arrow-icon2').on((e) => this.handleShowTickets(e, bills, 2))
     $('#arrow-icon3').on((e) => this.handleShowTickets(e, bills, 3))
     //this.getBillsAllUsers()
@@ -91,9 +110,9 @@ export default class {
   handleEditTicket(e, bill, bills) {
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
-    if (this.counter % 2 === 0) {
+    if (this.counter % 2 === 0) {//modif b en bill
       bills.forEach(b => {
-        $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
+        $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })// modif b en bill
       })
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
@@ -133,14 +152,24 @@ export default class {
     this.onNavigate(ROUTES_PATH['Dashboard'])
   }
 
+  /**
+   * 
+   * @param {Event} e 
+   * @param {Object} bills données à traiter récupérées de la bdd
+   * @param {*} index index de la flèche cliquée
+   * @returns 
+   */
+
   handleShowTickets(e, bills, index) {
-    if (this.counter === undefined || this.index !== index) this.counter = 0
-    if (this.index === undefined || this.index !== index) this.index = index
-    if (this.counter % 2 === 0) {
+    console.log('handleShowTickets');
+    if (this.counter === undefined || this.index !== index) this.counter = 0 // déclare un compteur de click, si on ne clique pas sur la même flèche le compteur se remet a 0
+    if (this.index === undefined || this.index !== index) this.index = index // défini l'index de la flèche sur laquelle on clique    
+    if (this.counter % 2 === 0) {                                            // créé un toggle pour afficher ou masquer le contenu
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
       $(`#status-bills-container${this.index}`)
-        .html(cards(filteredBills(bills, getStatus(this.index))))
+        .html(cards(filteredBills(bills, getStatus(this.index)))) //ouvre et rend les bills correspondantes
       this.counter ++
+      console.log(this.counter);
     } else {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
       $(`#status-bills-container${this.index}`)
@@ -149,7 +178,16 @@ export default class {
     }
 
     bills.forEach(bill => {
-      $(`#open-bill${bill.id}`).on((e) => this.handleEditTicket(e, bill, bills))
+      // $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+      $(`#open-bill${bill.id}`,` #status-bills-container${this.index} `).on((e) => {//modifié pour afficher le contenu de chaque facture
+        this.handleEditTicket(e, bill, bills)
+        })
+        // let var1 = $(`#status-bills-container${this.index}` )
+        // console.log('conteneur' , var1);
+        // let var2 = $(`#open-bill${bill.id}`)
+        // console.log('var2',var2);
+        let all = $(`#open-bill${bill.id}`, `#status-bills-container${this.index}` )
+        console.log('all', all);
     })
 
     return bills
@@ -170,7 +208,7 @@ export default class {
           date: doc.date,
           status: doc.status
         }))
-        return bills
+        return bills//retourne les données a traiter de la bdd
       })
       .catch(error =>{
         throw error;

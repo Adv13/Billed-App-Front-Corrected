@@ -4,14 +4,23 @@
 
 import '@testing-library/jest-dom'
 import { screen, fireEvent, getByTestId } from "@testing-library/dom"
-import NewBillUI from "../views/NewBillUI.js"
+import NewBillUI from "../views/NewBillUI.js"//added
 import NewBill from "../containers/NewBill.js"
 import {localStorageMock } from '../__mocks__/localStorage.js'
-import { ROUTES } from '../constants/routes.js'
+import {ROUTES , ROUTES_PATH} from '../constants/routes.js'
+import Router from "../app/Router.js"//added
+import store from "../__mocks__/store.js"//added
 
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
+    test("Then mail icon in vertical layout should be highlighted",()=>{
+      window.localStorage.setItem('user', JSON.stringify({type: 'Employee'}))// défini le user en tant qu'employé dans le local storage
+      Object.defineProperty(window, "location", { value: { hash: ROUTES_PATH['NewBill'] } });// défini l'url comme étant '#employee/bills/new'
+      document.body.innerHTML = `<div id="root"></div>` // crée le noeud pour que le router injecte l'objet correspondant à l'url
+      Router();// lance le router
+      expect(screen.getByTestId('icon-mail').classList.contains('active-icon')).toBe(true) // vérifie si l'icone est en surbrillance
+    })
     test("Then Envoyer une note de frais is displayed", () => {
       const html = NewBillUI()
       document.body.innerHTML = html
@@ -49,9 +58,9 @@ describe("Given I am connected as an employee", () => {
       // modifie le localStorage par le  localStorageMock
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({type: 'Employee'}))
-      let firestore = null
+      let store = jest.fn()
       let localStorage = window.localStorage
-      const newBill = new NewBill({document, onNavigate, firestore , localStorage})
+      const newBill = new NewBill({document, onNavigate, store , localStorage})
       const handleChangeFile = jest.fn(newBill.handleChangeFile)
       const fileBtn = screen.getByTestId('file')
       expect(fileBtn).toBeDefined()
@@ -60,6 +69,68 @@ describe("Given I am connected as an employee", () => {
       expect(handleChangeFile).toHaveBeenCalled()
     })
 
+  })
+})
+
+// test d'intégration POST
+describe("Given I am a user connected as Admin", () => {
+  describe("When I navigate to Dashboard", () => {
+    test("fetches bills from mock API POST", async () => {
+      const html = NewBillUI()
+      document.body.innerHTML = html  
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+     const testBill = 
+      {
+        "id": "test1",
+        "vat": "80",
+        "fileUrl": "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
+        "status": "pending",
+        "type": "Hôtel et logement",
+        "commentary": "séminaire billed",
+        "name": "encore",
+        "fileName": "preview-facture-free-201801-pdf-1.jpg",
+        "date": "2004-04-04",
+        "amount": 400,
+        "commentAdmin": "ok",
+        "email": "a@a",
+        "pct": 20      
+      }
+      const newBill = new NewBill({document, onNavigate, store , localStorage})
+      expect(newBill).toBeDefined()
+      expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
+
+      const handleSubmit = jest.fn(newBill.handleSubmit)
+      const newBillform = screen.getByTestId("form-new-bill")
+      newBillform.addEventListener('submit', handleSubmit)
+      fireEvent.submit(newBillform)
+      expect(handleSubmit).toHaveBeenCalled()
+
+
+       const getSpy = jest.spyOn(store, "post") // fonction simulée qui surveille l'appel de la méthode get de l'objet store       
+       const bills = await store.post(testBill) 
+       expect(getSpy).toHaveBeenCalledTimes(1)
+
+    })
+    test("fetches bills from an API and fails with 404 message error", async () => {
+      store.post.mockImplementationOnce(() => // simule un rejet de la promesse
+        Promise.reject(new Error("Erreur 404"))
+      )
+      const html = BillsUI({ error: "Erreur 404" })
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 404/)
+      expect(message).toBeTruthy()
+    })
+    test("fetches messages from an API and fails with 500 message error", async () => {
+      store.post.mockImplementationOnce(() =>
+        Promise.reject(new Error("Erreur 500"))
+      )
+      const html = BillsUI({ error: "Erreur 500" })
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 500/)
+      expect(message).toBeTruthy()
+    })
   })
 })
 

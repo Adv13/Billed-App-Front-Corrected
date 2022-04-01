@@ -103,7 +103,7 @@ export default () => {
       rootDiv.innerHTML = ROUTES({ pathname: window.location.hash, loading: true })
       const bills = new Dashboard({ document, onNavigate, firestore, bills: [], localStorage })
       bills.getBillsAllUsers().then(bills => {
-        rootDiv.innerHTML = DashboardUI({ data: { bills }})
+        rootDiv.innerHTML = DashboardUI({ data: { bills } })
         new Dashboard({ document, onNavigate, firestore, bills, localStorage })
       }).catch(error => {
         rootDiv.innerHTML = ROUTES({ pathname: window.location.hash, error })

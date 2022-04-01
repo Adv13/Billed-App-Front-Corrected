@@ -15,8 +15,10 @@ export default class NewBill {
     this.fileName = null
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
+    this.validFormat = null
   }
   handleChangeFile = e => {
+    console.log('ok from containers NewBill.js');
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     console.log('file', file);//afficher dans la console
@@ -31,25 +33,29 @@ export default class NewBill {
     formData.append('file', file)//ajoute une clef valeur à formData
     formData.append('email', email)//ajoute une clef valeur à formData
 
-    // test du format de l'image
-    if(fileName.endsWith('jpg'|| 'jpeg' || 'png')){      
-      this.store 
-        .bills()
-        .create({
-          data: formData,
-          headers: {
-            noContentType: true
-          }
-        })
-        .then(({fileUrl, key}) => {
-          console.log(fileUrl)
-          this.billId = key
-          this.fileUrl = fileUrl
-          this.fileName = fileName
-        }).catch(error => console.error(error))
+    this.validFormat = true   // défini que le format est valide
+
+      // test du format de l'image
+      if ( /\.(jpe?g|png)$/i.test(fileName) ){  
+        this.validFormat= true  // vérifie l'extension du fichier        
+          this.store 
+            .bills()
+            .create({
+              data: formData,
+              headers: {
+                noContentType: true
+              }
+            })
+            .then(({fileUrl, key}) => {
+              this.billId = key
+              this.fileUrl = fileUrl
+              this.fileName = fileName
+            }).catch(error => console.error(error))
     }else{
-      alert('Format non supporté. Veuillez sélectionner un média au format .jpg , .jpeg ou .png.' )
-      return
+      alert('Format non supporté. Veuillez sélectionner un média au format .jpg , .jpeg ou .png uniquement.' ) // format non valide alert un mesg
+      this.validFormat = false // défini que le format est invalide
+      console.log(validFormat);
+      return 
     }
   }
 
@@ -57,21 +63,29 @@ export default class NewBill {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
     const email = JSON.parse(localStorage.getItem("user")).email
-    const bill = {
-      email,
-      type: e.target.querySelector(`select[data-testid="expense-type"]`).value,
-      name:  e.target.querySelector(`input[data-testid="expense-name"]`).value,
-      amount: parseInt(e.target.querySelector(`input[data-testid="amount"]`).value),
-      date:  e.target.querySelector(`input[data-testid="datepicker"]`).value,
-      vat: e.target.querySelector(`input[data-testid="vat"]`).value,
-      pct: parseInt(e.target.querySelector(`input[data-testid="pct"]`).value) || 20,
-      commentary: e.target.querySelector(`textarea[data-testid="commentary"]`).value,
-      fileUrl: this.fileUrl,
-      fileName: this.fileName,
-      status: 'pending'
+    if(this.validFormat === true){ //si le format du justificatif est valide on crée un nouveau bill
+      const bill = {
+        email,
+        type: e.target.querySelector(`select[data-testid="expense-type"]`).value,
+        name:  e.target.querySelector(`input[data-testid="expense-name"]`).value,
+        amount: parseInt(e.target.querySelector(`input[data-testid="amount"]`).value),
+        date:  e.target.querySelector(`input[data-testid="datepicker"]`).value,
+        vat: e.target.querySelector(`input[data-testid="vat"]`).value,
+        pct: parseInt(e.target.querySelector(`input[data-testid="pct"]`).value) || 20,
+        commentary: e.target.querySelector(`textarea[data-testid="commentary"]`).value,
+        fileUrl: this.fileUrl,
+        fileName: this.fileName,
+        status: 'pending'
+      }
+
+      this.updateBill(bill)
+      this.onNavigate(ROUTES_PATH['Bills'])
     }
-    this.updateBill(bill)
-    this.onNavigate(ROUTES_PATH['Bills'])
+    else{ //sinon on empêche la soumission  du formulaire
+      alert('Format du Justificatif non supporté. Veuillez le modifier.') //on demande à l'utilisateur de le modifier le format fichier si invalide
+      return
+    }
+    
   }
 
   // not need to cover this function by tests

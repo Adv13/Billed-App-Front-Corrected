@@ -59,6 +59,7 @@ export default class Login {
   }
 
   // not need to cover this function by tests
+  // istanbul ignore next
   login = (user) => {
     if (this.firestore) {
       return this.firestore
@@ -75,6 +76,7 @@ export default class Login {
   }
 
   // not need to cover this function by tests
+  // istanbul ignore next
   createUser = (user) => {
     if (this.firestore) {
       return this.firestore

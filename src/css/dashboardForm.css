@@ -82,3 +82,7 @@
 #file-name-admin {
   max-width: 300px;
 }
+/*ajout css pour l'image dans le body de la modale*/
+.modal-body img{
+  width: 100%;
+}
