@@ -23,17 +23,16 @@ export default class Login {
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
-    this.login(user)
+    const userExists = this.checkIfUserExists(user)
+    if (!userExists) this.createUser(user)
+    e.preventDefault()
+    this.onNavigate(ROUTES_PATH['Bills'])
+    this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
+    PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+    // console.log(this.PREVIOUS_LOCATION);
     
-      .catch(
-        (err) => this.createUser(user, err)
-      )
-      .then(() => {
-        this.onNavigate(ROUTES_PATH['Bills'])
-        this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
-        PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-        this.document.body.style.backgroundColor="#fff"
-      })
+    // console.log(this.localStorage.user);
+    this.document.body.style.backgroundColor="#fff"
 
   }
 
@@ -46,52 +45,47 @@ export default class Login {
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
-    this.login(user)
-      .catch(
-        (err) => this.createUser(user, err)
-      )
-      .then(() => {
-        this.onNavigate(ROUTES_PATH['Dashboard'])
-        this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
-        PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-        document.body.style.backgroundColor="#fff"
-      })
+    const userExists = this.checkIfUserExists(user)
+    if (!userExists) this.createUser(user)
+    e.preventDefault()
+    this.onNavigate(ROUTES_PATH['Dashboard'])
+    this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
+    PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+    document.body.style.backgroundColor="#fff"
   }
 
   // not need to cover this function by tests
-  /* istanbul ignore next */
-  login = (user) => {
+  checkIfUserExists = (user) => {
     if (this.firestore) {
-      return this.firestore
-      .login(JSON.stringify({
-        email: user.email,
-        password: user.password,
-      })).then(({jwt}) => {
-        localStorage.setItem('jwt', jwt)
+      this.firestore
+      .user(user.email)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          console.log(`User with ${user.email} exists`)
+          return true
+        } else {
+          return false
+        }
       })
-      .catch(error => console.error(error))
+      .catch(error => error)
     } else {
       return null
     }
   }
 
   // not need to cover this function by tests
-  /* istanbul ignore next */
   createUser = (user) => {
     if (this.firestore) {
-      return this.firestore
+      this.firestore
       .users()
-      .create({data:JSON.stringify({
+      .doc(user.email)
+      .set({
         type: user.type,
-        name: user.email.split('@')[0],
-        email: user.email,
-        password: user.password,
-      })})
-      .then(() => {
-        console.log(`User with ${user.email} is created`)
-        return this.login(user)
+        name: user.email.split('@')[0] 
       })
-      .catch(error => console.error(error))
+      .then(() => console.log(`User with ${user.email} is created`))
+      .catch(error => error)
     } else {
       return null
     }

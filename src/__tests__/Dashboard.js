@@ -1,11 +1,11 @@
-import { fireEvent, screen, waitFor } from "@testing-library/dom"
+import { fireEvent, screen } from "@testing-library/dom"
 import userEvent from '@testing-library/user-event'
 import DashboardFormUI from "../views/DashboardFormUI.js"
 import DashboardUI from "../views/DashboardUI.js"
 import Dashboard, { filteredBills, cards } from "../containers/Dashboard.js"
 import { ROUTES } from "../constants/routes"
 import { localStorageMock } from "../__mocks__/localStorage.js"
-import store from "../__mocks__/store"
+import firebase from "../__mocks__/firebase"
 import { bills } from "../fixtures/bills"
 
 
@@ -30,20 +30,22 @@ describe('Given I am connected as an Admin', () => {
   })
   describe('When I am on Dashboard page but it is loading', () => {
     test('Then, Loading page should be rendered', () => {
-      document.body.innerHTML = DashboardUI({ loading: true })
+      const html = DashboardUI({ loading: true })
+      document.body.innerHTML = html
       expect(screen.getAllByText('Loading...')).toBeTruthy()
     })
   })
   describe('When I am on Dashboard page but back-end send an error message', () => {
     test('Then, Error page should be rendered', () => {
-      document.body.innerHTML = DashboardUI({ error: 'some error message' })
+      const html = DashboardUI({ error: 'some error message' })
+      document.body.innerHTML = html
       expect(screen.getAllByText('Erreur')).toBeTruthy()
     })
   })
 
   describe('When I am on Dashboard page and I click on arrow', () => {
-    test('Then, tickets list should be unfolding, and cards should contain first and lastname', async () => {
-
+    test('Then, tickets list should be unfolding, and cars should contain first and lastname', async () => {
+      
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
@@ -54,9 +56,11 @@ describe('Given I am connected as an Admin', () => {
       }))
 
       const dashboard = new Dashboard({
-        document, onNavigate, firestore: null, bills:bills, localStorage: window.localStorage
+        document, onNavigate, firestore: null, bills, localStorage: window.localStorage
       })          
-      document.body.innerHTML = DashboardUI({ data: { bills } })
+      const html = DashboardUI({ data: bills })
+   
+      document.body.innerHTML = html
 
       const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1)) 
       const handleShowTickets2 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 2))    
@@ -69,86 +73,48 @@ describe('Given I am connected as an Admin', () => {
       icon1.addEventListener('click', handleShowTickets1)
       userEvent.click(icon1)
       expect(handleShowTickets1).toHaveBeenCalled()
-      await waitFor(() => screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`) )
-      expect(screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`)).toBeTruthy()
+      userEvent.click(icon1)
 
       icon2.addEventListener('click', handleShowTickets2)
       userEvent.click(icon2)
       expect(handleShowTickets2).toHaveBeenCalled()
-      await waitFor(() => screen.getByTestId(`open-billUIUZtnPQvnbFnB0ozvJh`) )
-      expect(screen.getByTestId(`open-billUIUZtnPQvnbFnB0ozvJh`)).toBeTruthy()
 
       icon3.addEventListener('click', handleShowTickets3)
       userEvent.click(icon3)
       expect(handleShowTickets3).toHaveBeenCalled()
-      await waitFor(() => screen.getByTestId(`open-billBeKy5Mo4jkmdfPGYpTxZ`) )
-      expect(screen.getByTestId(`open-billBeKy5Mo4jkmdfPGYpTxZ`)).toBeTruthy()
 
     })
   })
 
   describe('When I am on Dashboard page and I click on edit icon of a card', () => {
     test('Then, right form should be filled', () => {
+      const html = cards(bills)
+      document.body.innerHTML = html
 
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
-      // modifie le localStorage par le localStorageMock
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Admin'
-      }))
-
-      const dashboard = new Dashboard({
-        document, onNavigate, firestore: null, bills:bills, localStorage: window.localStorage
-      })
-      document.body.innerHTML = DashboardUI({ data: { bills } })
-      const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1))
-      const icon1 = screen.getByTestId('arrow-icon1')
-      icon1.addEventListener('click', handleShowTickets1)
-      userEvent.click(icon1)
-      expect(handleShowTickets1).toHaveBeenCalled()
-      expect(screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`)).toBeTruthy()
-      const iconEdit = screen.getByTestId('open-bill47qAXb6fIm2zOKkLzMro')
-      userEvent.click(iconEdit)
-      expect(screen.getByTestId(`dashboard-form`)).toBeTruthy()
-    })
-  })
-
-  describe('When I am on Dashboard page and I click 2 times on edit icon of a card', () => {
-    test('Then, big bill Icon should Appear',  () => {
-
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }
+      const firestore = null
 
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Admin'
-      }))
-
       const dashboard = new Dashboard({
-        document, onNavigate, firestore: null, bills:bills, localStorage: window.localStorage
+        document, onNavigate, firestore, bills, localStorage: window.localStorage
       })
-      document.body.innerHTML = DashboardUI({ data: { bills } })
 
-      const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1))
-      const icon1 = screen.getByTestId('arrow-icon1')
-      icon1.addEventListener('click', handleShowTickets1)
-      userEvent.click(icon1)
-      expect(handleShowTickets1).toHaveBeenCalled()
-      expect(screen.getByTestId(`open-bill47qAXb6fIm2zOKkLzMro`)).toBeTruthy()
+      const handleEditTicket = jest.fn((e) => dashboard.handleEditTicket(e, bills[0], bills))   
       const iconEdit = screen.getByTestId('open-bill47qAXb6fIm2zOKkLzMro')
+      iconEdit.addEventListener('click', handleEditTicket)
       userEvent.click(iconEdit)
+      expect(handleEditTicket).toHaveBeenCalled()
       userEvent.click(iconEdit)
-      const bigBilledIcon = screen.queryByTestId("big-billed-icon")
-      expect(bigBilledIcon).toBeTruthy()
+      expect(handleEditTicket).toHaveBeenCalled()
     })
   })
 
   describe('When I am on Dashboard and there are no bills', () => {
     test('Then, no cards should be shown', () => {
-      document.body.innerHTML = cards([])
+      const html = cards([])
+      document.body.innerHTML = html
 
       const iconEdit = screen.queryByTestId('open-bill47qAXb6fIm2zOKkLzMro')
       expect(iconEdit).toBeNull()
@@ -163,8 +129,8 @@ describe('Given I am connected as Admin, and I am on Dashboard page, and I click
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Admin'
       }))
-      document.body.innerHTML = DashboardFormUI(bills[0])
-
+      const html = DashboardFormUI(bills[0])
+      document.body.innerHTML = html
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
@@ -188,8 +154,8 @@ describe('Given I am connected as Admin, and I am on Dashboard page, and I click
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Admin'
       }))
-      document.body.innerHTML = DashboardFormUI(bills[0])
-
+      const html = DashboardFormUI(bills[0])
+      document.body.innerHTML = html
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
@@ -215,7 +181,8 @@ describe('Given I am connected as Admin and I am on Dashboard page and I clicked
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Admin'
       }))
-      document.body.innerHTML = DashboardFormUI(bills[0])
+      const html = DashboardFormUI(bills[0])
+      document.body.innerHTML = html
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
@@ -240,13 +207,13 @@ describe('Given I am connected as Admin and I am on Dashboard page and I clicked
 describe("Given I am a user connected as Admin", () => {
   describe("When I navigate to Dashboard", () => {
     test("fetches bills from mock API GET", async () => {
-       const getSpy = jest.spyOn(store, "get")//fonction simulée qui  surveille l'appel de la méthode get de l'objet store
-       const bills = await store.get()
+       const getSpy = jest.spyOn(firebase, "get")
+       const bills = await firebase.get()
        expect(getSpy).toHaveBeenCalledTimes(1)
        expect(bills.data.length).toBe(4)
     })
     test("fetches bills from an API and fails with 404 message error", async () => {
-      store.get.mockImplementationOnce(() =>// simule un rejet de la promesse
+      firebase.get.mockImplementationOnce(() =>
         Promise.reject(new Error("Erreur 404"))
       )
       const html = DashboardUI({ error: "Erreur 404" })
@@ -255,7 +222,7 @@ describe("Given I am a user connected as Admin", () => {
       expect(message).toBeTruthy()
     })
     test("fetches messages from an API and fails with 500 message error", async () => {
-      store.get.mockImplementationOnce(() =>
+      firebase.get.mockImplementationOnce(() =>
         Promise.reject(new Error("Erreur 500"))
       )
       const html = DashboardUI({ error: "Erreur 500" })
@@ -265,67 +232,3 @@ describe("Given I am a user connected as Admin", () => {
     })
   })
 })
-
-/*// test d'intégration GET
-describe("Given I am a user connected as Admin", () => {
-  describe("When I navigate to Dashboard", () => {
-    test("fetches bills from mock API GET", async () => {
-      localStorage.setItem("user", JSON.stringify({ type: "Admin", email: "a@a" }));
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.append(root)
-      router()
-      window.onNavigate(ROUTES_PATH.Dashboard)
-      await waitFor(() => screen.getByText("Validations"))
-      const contentPending  = await screen.getByText("En attente (1)")
-      expect(contentPending).toBeTruthy()
-      const contentRefused  = await screen.getByText("Refusé (2)")
-      expect(contentRefused).toBeTruthy()
-      expect(screen.getByTestId("big-billed-icon")).toBeTruthy()
-    })
-  describe("When an error occurs on API", () => {
-    beforeEach(() => {
-      jest.spyOn(mockStore, "bills")
-      Object.defineProperty(
-          window,
-          'localStorage',
-          { value: localStorageMock }
-      )
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Admin',
-        email: "a@a"
-      }))
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.appendChild(root)
-      router()
-    })
-    test("fetches bills from an API and fails with 404 message error", async () => {
-
-      mockStore.bills.mockImplementationOnce(() => {
-        return {
-          list : () =>  {
-            return Promise.reject(new Error("Erreur 404"))
-          }
-        }})
-      window.onNavigate(ROUTES_PATH.Dashboard)
-      await new Promise(process.nextTick);
-      const message = await screen.getByText(/Erreur 404/)
-      expect(message).toBeTruthy()
-    })
-
-    test("fetches messages from an API and fails with 500 message error", async () => {
-
-      mockStore.bills.mockImplementationOnce(() => {
-        return {
-          list : () =>  {
-            return Promise.reject(new Error("Erreur 500"))
-          }
-        }})
-
-      window.onNavigate(ROUTES_PATH.Dashboard)
-      await new Promise(process.nextTick);
-      const message = await screen.getByText(/Erreur 500/)
-      expect(message).toBeTruthy()
-    })
-  })*/
