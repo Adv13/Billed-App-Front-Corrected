@@ -1,6 +1,5 @@
 import { ROUTES_PATH } from '../constants/routes.js'
 import Logout from "./Logout.js"
-import {localStorageMock} from '../__mocks__/localStorage.js'
 
 export default class NewBill {
   constructor({ document, onNavigate, firestore, localStorage }) {

@@ -72,7 +72,7 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-
+//for all
 describe("When I select a file", () => {
   test("Then it should be changed in the input", () => {
     Object.defineProperty(window, 'localStorage', { value: localStorageMock })// Set localStorage
@@ -105,64 +105,6 @@ describe("When I select a file", () => {
 
 // test d'intégration POST
 describe("Given I am a user connected as Admin", () => {
-  describe("When I navigate to Dashboard", () => {
-    test("fetches bills from mock API POST", async () => {
-      const html = NewBillUI()
-      document.body.innerHTML = html  
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }
-     const testBill = 
-      {
-        "id": "test1",
-        "vat": "80",
-        "fileUrl": "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
-        "status": "pending",
-        "type": "Hôtel et logement",
-        "commentary": "séminaire billed",
-        "name": "encore",
-        "fileName": "preview-facture-free-201801-pdf-1.jpg",
-        "date": "2004-04-04",
-        "amount": 400,
-        "commentAdmin": "ok",
-        "email": "a@a",
-        "pct": 20  
-        
-        /* Remplacer le dessus par le contenu ci-dessous pour simuler refused :
-        "id": "qcCK3SzECmaZAGRrHjaC",
-        "status": "refused",
-        "pct": 20,
-        "amount": 200,
-        "email": "a@a",
-        "name": "test2",
-        "vat": "40",
-        "fileName": "preview-facture-free-201801-pdf-1.jpg",
-        "date": "2002-02-02",
-        "commentAdmin": "pas la bonne facture",
-        "commentary": "test2",
-        "type": "Restaurants et bars",
-        "fileUrl": "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=4df6ed2c-12c8-42a2-b013-346c1346f732"
-        
-        Et mettre le bloc suivant jusqu'à 
-        expect(handleSubmit).toHaveBeenCalled()
-        en commentaires*/
-      }
-      const newBill = new NewBill({document, onNavigate, store , localStorage})
-      expect(newBill).toBeDefined()
-      expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
-      const handleSubmit = jest.fn(newBill.handleSubmit)
-      const newBillform = screen.getByTestId("form-new-bill")
-      newBillform.addEventListener('submit', handleSubmit)
-      fireEvent.submit(newBillform)
-      expect(handleSubmit).toHaveBeenCalled()
-
-
-       const getSpy = jest.spyOn(store, "post") // fonction simulée qui surveille l'appel de la méthode POST de l'objet store       
-       const bills = await store.post(testBill) 
-       expect(getSpy).toHaveBeenCalledTimes(1)
-       expect(bills.status).toBe(200)
-
-    })
     test("fetches bills from an API and fails with 404 message error", async () => {
       store.post.mockImplementationOnce(() => // simule un rejet de la promesse
         Promise.reject(new Error("Erreur 404"))
@@ -182,6 +124,6 @@ describe("Given I am a user connected as Admin", () => {
       expect(message).toBeTruthy()
     })
   })
-})
 
-console.log('test from test NewBill.js"');
+
+console.log('tests from test NewBill.js"');

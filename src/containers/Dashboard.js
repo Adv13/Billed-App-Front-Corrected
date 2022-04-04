@@ -72,7 +72,8 @@ export const card = (bill) => {
  */
 
 export const cards = (bills) => {
-  return bills && bills.length ? bills.map(bill => card(bill)).join("") : ""
+  let filteredBills = bills.sort((a,b) => new Date(b.date) - new Date(a.date)) // ordre décroissant pour les dates
+  return bills && bills.length ? filteredBills.map(bill => card(bill)).join("") : ""
 }
 
 export const getStatus = (index) => {
@@ -91,13 +92,11 @@ export default class {
     this.document = document
     this.onNavigate = onNavigate
     this.firestore = firestore
-    $('#arrow-icon1').on((e) => this.handleShowTickets(e, bills, 1))// lance la méthode handleShowTicket au click sur la flèche
-    $('#arrow-icon2').on((e) => this.handleShowTickets(e, bills, 2))
-    $('#arrow-icon3').on((e) => this.handleShowTickets(e, bills, 3))
-    //this.getBillsAllUsers()
+    $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))// lance la méthode handleShowTicket au click sur la flèche
+    $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
+    $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
+    this.getBillsAllUsers()
     new Logout({ localStorage, onNavigate })
-    /*bills.forEach(bill => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))*/
   }
 
   handleClickIconEye = () => {
@@ -127,9 +126,9 @@ export default class {
       $('.vertical-navbar').css({ height: '120vh' })
       this.counter ++
     }
-    $('#icon-eye-d').on(this.handleClickIconEye)
-    $('#btn-accept-bill').on((e) => this.handleAcceptSubmit(e, bill))
-    $('#btn-refuse-bill').on((e) => this.handleRefuseSubmit(e, bill))
+    $('#icon-eye-d').click(this.handleClickIconEye)
+    $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
+    $('#btn-refuse-bill').click((e) => this.handleRefuseSubmit(e, bill))
   }
 
   handleAcceptSubmit = (e, bill) => {
@@ -179,7 +178,7 @@ export default class {
 
     bills.forEach(bill => {
       // $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
-      $(`#open-bill${bill.id}`,` #status-bills-container${this.index} `).on((e) => {//modifié pour afficher le contenu de chaque facture
+      $(`#open-bill${bill.id}`,` #status-bills-container${this.index} `).click((e) => {//modifié pour afficher le contenu de chaque facture
         this.handleEditTicket(e, bill, bills)
         })
     })
@@ -204,11 +203,9 @@ export default class {
         }))
         return bills//retourne les données a traiter de la bdd
       })
-      .catch(error =>{
-        throw error;
-      })
+      .catch(console.log)
+      }
     }
-  }
 
   // not need to cover this function by tests
   /* istanbul ignore next */
