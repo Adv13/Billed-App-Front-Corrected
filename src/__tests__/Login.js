@@ -53,8 +53,8 @@ describe("Given that I am a user on login page", () => {
     test("Then I should be identified as an Employee in app", () => {
       document.body.innerHTML = LoginUI()
     const inputData = {
-      email: "johndoe@email.com",
-      password: "azerty"
+      email: "employee@test.tld",
+      password: "employee"
     }
 
     const inputEmailUser = screen.getByTestId("employee-email-input")
@@ -83,14 +83,14 @@ describe("Given that I am a user on login page", () => {
 
     let PREVIOUS_LOCATION = ''
 
-    const firebase = jest.fn()
+    const store= jest.fn()
 
     const login = new Login({
       document,
       localStorage: window.localStorage,
       onNavigate,
       PREVIOUS_LOCATION,
-      firebase
+      store
     })
 
     const handleSubmit = jest.fn(login.handleSubmitEmployee)    
@@ -123,7 +123,7 @@ describe("Given that I am a user on login page", () => {
       document.body.innerHTML = LoginUI()
 
       const inputEmailUser = screen.getByTestId("admin-email-input")
-      expect(inputEmailUser.value).toBe("")
+      expect(inputEmailUser.value).toBe("admin")
           
       const inputPasswordUser = screen.getByTestId("admin-password-input")
       expect(inputPasswordUser.value).toBe("")

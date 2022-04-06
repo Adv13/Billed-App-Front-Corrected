@@ -8,6 +8,11 @@
   margin-top: 16px;
 }
 
+.error-msg{
+  color: red;
+  font-size: 18px;
+}
+
 .col-half-row {
   display:flex;
   width: 75%;

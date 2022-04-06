@@ -2,7 +2,7 @@ import { ROUTES_PATH } from '../constants/routes.js'
 import Logout from "./Logout.js"
 
 export default class NewBill {
-  constructor({ document, onNavigate, firestore, localStorage }) {
+  constructor({ document, onNavigate, firestore, localStorage}) {
     this.document = document
     this.onNavigate = onNavigate
     this.firestore = firestore
@@ -14,7 +14,6 @@ export default class NewBill {
     this.fileName = null
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
-    this.validFormat = null//A enlever pour simuler format refusé et afficher l'alerte
   }
   handleChangeFile = e => {
     console.log('ok from containers NewBill.js');
@@ -22,7 +21,7 @@ export default class NewBill {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     console.log('file', file);//afficher dans la console
     const filePath = e.target.value.split(/\\/g)
-    console.log('file' , filePath);
+    console.log('file' , filePath);//afficher le chemin dans la console
     const fileName = filePath[filePath.length-1]
     console.log('filename' , fileName);
     const formData = new FormData()// créé un nouvel objet "form" vide
@@ -32,11 +31,11 @@ export default class NewBill {
     formData.append('file', file)//ajoute une clef valeur à formData
     formData.append('email', email)//ajoute une clef valeur à formData
 
-    this.validFormat = true   // défini que le format est valide. A enlever pour simuler format refusé et afficher l'alerte
+    //this.validFormat = true   // défini que le format est valide. A enlever pour simuler format refusé et afficher l'alerte
 
       // test du format de l'image
       if ( /\.(jpe?g|png)$/i.test(fileName) ){  
-        this.validFormat= true  // vérifie l'extension du fichier. A enlever pour simuler format refusé et afficher l'alerte        
+        //this.validFormat= true  // vérifie l'extension du fichier. A enlever pour simuler format refusé et afficher l'alerte        
           this.firestore 
             .bills()
             .create({
@@ -52,8 +51,7 @@ export default class NewBill {
             }).catch(error => console.error(error))
     }else{
       alert('Format non supporté. Veuillez sélectionner un média au format .jpg , .jpeg ou .png uniquement.' ) // format non valide alert un mesg
-      this.validFormat = false // défini que le format est invalide. A enlever pour simuler format refusé et afficher l'alerte
-      console.log(validFormat);
+      //this.validFormat = false // défini que le format est invalide. A enlever pour simuler format refusé et afficher l'alerte
       return 
     }
   }
@@ -88,7 +86,6 @@ export default class NewBill {
   }
 
   // not need to cover this function by tests
-  //istanbul ignore next
   updateBill = (bill) => {
     if (this.firestore) {
       this.firestore

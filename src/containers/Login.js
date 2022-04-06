@@ -1,6 +1,5 @@
 import { ROUTES_PATH } from '../constants/routes.js'
 export let PREVIOUS_LOCATION = ''
-
 // we use a class so as to test its methods in e2e tests
 export default class Login {
   constructor({ document, localStorage, onNavigate, PREVIOUS_LOCATION, firestore }) {
@@ -23,19 +22,18 @@ export default class Login {
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
-    const userExists = this.checkIfUserExists(user)
-    if (!userExists) this.createUser(user)
-    e.preventDefault()
-    this.onNavigate(ROUTES_PATH['Bills'])
-    this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
-    PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-    // console.log(this.PREVIOUS_LOCATION);
+    this.login(user)
     
-    // console.log(this.localStorage.user);
-    this.document.body.style.backgroundColor="#fff"
-
+      .catch(
+        (err) => this.createUser(user, err)
+      )
+      .then(() => {
+        this.onNavigate(ROUTES_PATH['Bills'])
+        this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
+        PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+        this.document.body.style.backgroundColor="#fff"
+      })
   }
-
   handleSubmitAdmin = e => {
     e.preventDefault()
     const user = {
@@ -45,20 +43,62 @@ export default class Login {
       status: "connected"
     }
     this.localStorage.setItem("user", JSON.stringify(user))
-    const userExists = this.checkIfUserExists(user)
-    if (!userExists) this.createUser(user)
-    e.preventDefault()
-    this.onNavigate(ROUTES_PATH['Dashboard'])
-    this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
-    PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-    document.body.style.backgroundColor="#fff"
+    this.login(user)
+      .catch(
+        (err) => this.createUser(user, err)
+      )
+      .then(() => {
+        this.onNavigate(ROUTES_PATH['Dashboard'])
+        this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
+        PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+        document.body.style.backgroundColor="#fff"
+      })
   }
 
   // not need to cover this function by tests
-  checkIfUserExists = (user) => {
+  /* istanbul ignore next */
+  login = (user) => {
     if (this.firestore) {
-      this.firestore
-      .user(user.email)
+      return this.firestore
+      .login(JSON.stringify({
+        email: user.email,
+        password: user.password,
+      })).then(({jwt}) => {
+        localStorage.setItem('jwt', jwt)
+      })
+      .catch(error => console.error(error))
+    } else {
+      return null
+    }
+  }
+
+  // not need to cover this function by tests
+  /* istanbul ignore next */
+  createUser = (user) => {
+    if (this.firestore) {
+      return this.firestore
+      .users()
+      .create({data:JSON.stringify({
+        type: user.type,
+        name: user.email.split('@')[0],
+        email: user.email,
+        password: user.password,
+      })})
+      .then(() => {
+        console.log(`User with ${user.email} is created`)
+        return this.login(user)
+      })
+      .catch(error => console.error(error))
+    } else {
+      return null
+    }
+  }
+} 
+  // not need to cover this function by tests
+ /* checkIfUserExists = (user) => {
+    if (this.firestore) {
+      return this.firestore
+      .users(user.email)
       .get()
       .then((doc) => {
         if (doc.exists) {
@@ -89,5 +129,8 @@ export default class Login {
     } else {
       return null
     }
-  }
-} 
+  }*/
+
+//console.log(`User with ${user.email} exists`)
+//.then(() => console.log(`User with ${user.email} is created`))
+//.catch(error => error)

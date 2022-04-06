@@ -192,7 +192,7 @@ export default class {
     if (this.firestore) {
       return this.firestore
       .bills()
-      .get()
+      .list()
       .then(snapshot => {
         const bills = snapshot
         .map(doc => ({
