@@ -8,6 +8,7 @@ import { screen,
   getByLabelText,
   getAllByText,
   getAllByPlaceholderText,
+  getByText,
   getByRole } from "@testing-library/dom"
 import '@testing-library/jest-dom'
 import NewBillUI from "../views/NewBillUI.js"//added
@@ -22,6 +23,8 @@ import { event } from "jquery"
 import BillsUI from '../views/BillsUI.js'
 
 
+
+/********************** TEST LA PRESENCE DES ELEMENTS SUR NEWBILL PAGE ************************/
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
@@ -58,8 +61,7 @@ describe("Given I am connected as an employee", () => {
     })
 
     // NewBill tests
-    it('Then  NewBill Class is defined',()=>{
-      
+    it('Then  NewBill Class is defined',()=>{    
       const html = NewBillUI()
       document.body.innerHTML = html
       const newBill = new NewBill({
@@ -73,43 +75,118 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-//for all
-describe("When I select a file", () => {
-  test("Then it should be changed in the input", () => {
-    Object.defineProperty(window, 'localStorage', { value: localStorageMock })// Set localStorage
-    window.localStorage.setItem('user', JSON.stringify({type: 'Employee'}))// Set user as Employee in localStorage
-    const html = NewBillUI()
-    document.body.innerHTML = html
-    let pathname =  ROUTES_PATH['NewBill']   
+/*********************** TESTS SUR COMPORTEMENTS NEWBIL PAGE ************** */
+/////////////////////// HANDLECHANGEFILE ////////////////////
+describe("Given I am connected as an employee", () => {
+  describe("When I am on NewBill Page and I add an image file", () => {
+    test("Then this new file should have been changed in the input file", () => {
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+      const html = NewBillUI();
+      document.body.innerHTML = html;
 
-    const newBill = new NewBill({
-      document,
-      onNavigate: (pathname) => document.body.innerHTML = ROUTES({ pathname }),
-      firestore: null,
-      localStorage: window.localStorage,
-      validFormat : true,
-    })     
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        firestore: null,
+        localStorage: window.localStorage,
+      });
+      const handleChangeFile = jest.fn(newBill.handleChangeFile);
+      const inputFile = screen.getByTestId("file");
+      inputFile.addEventListener("change", handleChangeFile);
+      fireEvent.change(inputFile, {
+        target: {
+          files: [new File(["image.png"], "image.png", { type: "image/png" })],
+        },
+      });
+      expect(handleChangeFile).toHaveBeenCalled();
+      expect(inputFile.files[0].name).toBe("image.png");
+    });
+  });
+});
 
+//////////////////////// HANDLESUBMITFILE //////////////////////////
+describe("Given I am connected as an employee", () => {
+  describe("When I am on NewBill Page and I submit the form width an image (jpg, jpeg, png)", () => {
+    test("Then it should create a new bill", () => {
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+      const firestore = null;
+      const html = NewBillUI();
+      document.body.innerHTML = html;
 
-    const handleChangeFile = jest.fn(newBill.handleChangeFile)
-    const inputFile = screen.getByTestId("file")
-    inputFile.addEventListener('change', handleChangeFile)
-    fireEvent.change(inputFile, {
-      target: {
-        files: [new File(["test.jpeg"], "test.jpeg", { type: "image/jpeg" })]
-      }
-    })
-    expect(handleChangeFile).toHaveBeenCalled();
-    expect(inputFile.files[0].name).toBe("test.jpeg");
-  })
-  
-})
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        firestore,
+        localStorage: window.localStorage,
+      });
+      const handleSubmit = jest.fn(newBill.handleSubmit);
+      const submitBtn = screen.getByTestId("form-new-bill");
+      submitBtn.addEventListener("submit", handleSubmit);
+      fireEvent.submit(submitBtn);
+      expect(handleSubmit).toHaveBeenCalled();
+    });
+  });
+});
+
+describe("Given I am connected as an employee", () => {
+  describe("When I am on NewBill Page and I submit the form width an image (jpg, jpeg, png)", () => {
+    test("Then it should create a new bill", () => {
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+      const firestore = null;
+      const html = NewBillUI();
+      document.body.innerHTML = html;
+
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        firestore,
+        localStorage: window.localStorage,
+      });
+      const handleSubmit = jest.fn(newBill.handleSubmit);
+      const submitBtn = screen.getByTestId("form-new-bill");
+      submitBtn.addEventListener("submit", handleSubmit);
+      fireEvent.submit(submitBtn);
+      expect(handleSubmit).toHaveBeenCalled();
+    });
+  });
+});
 
 // test d'intégration POST
 describe("When I navigate in Bills page", () => {
   test("fetches bills from mock API Post", async () => {
-    
-
       const newBill = {
         "id": "qcCK3SzECmaZAGRrHjaC",
         "status": "refused",
@@ -126,7 +203,6 @@ describe("When I navigate in Bills page", () => {
         "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=4df6ed2c-12c8-42a2-b013-346c1346f732"
       }
    
-            
              const getSpy = jest.spyOn(store, "post")
              const bills = await store.post(newBill) 
              const addBill = [...bills.data, newBill]
