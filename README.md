@@ -119,3 +119,12 @@ $jest NewBill
 ## Comment voir la couverture de test ?
 
 `http://127.0.0.1:8080/coverage/lcov-report/`
+
+## Résultats de tous les tests au démarrage du projet : 
+
+[Tests au démarrage du projet](https://github.com/Adv13/DENIE_Tiffany_9_03032022/blob/debuggPart/TESTS_DEMARRAGE/2022-03-15%2016_55_46-1erTest04.png)
+
+## Résultats à la fin du projet :
+[Tests finaux](https://github.com/Adv13/DENIE_Tiffany_9_03032022/blob/debuggPart/TESTS_FINAUX/2022-04-07%2021_48_46-All_tests.png)
+[Test de Bill.js](https://github.com/Adv13/DENIE_Tiffany_9_03032022/blob/debuggPart/TESTS_FINAUX/2022-04-07%2021_46_38-Jest_Bills.png)
+[Test de NewBill.js](https://github.com/Adv13/DENIE_Tiffany_9_03032022/blob/debuggPart/TESTS_FINAUX/2022-04-07%2021_46_38-Jest_NewBill.png)
