@@ -18,8 +18,8 @@ describe("Given I am connected as an employee", () => {
       Object.defineProperty(window, "location", { value: { hash: ROUTES_PATH['Bills'] } });// défini l'url comme étant '#employee/bills'
       document.body.innerHTML = `<div id="root"></div>` // créé le noeud pour que le router injecte l'objet correspondant à l'url
       Router();// lance le router
-      const checkClass = screen.getByTestId("icon-window").classList.contains("active-icon");
-      expect(checkClass).toBeTruthy(); // vérifie si l'icone est la
+      const checkClass = screen.getByTestId("icon-window").classList.contains("active-icon");//met l'id "icon-window" contenant la class "active-icon" dans la variable "checkClass"
+      expect(checkClass).toBeTruthy(); // vérifie si la class "active-icon" est la
 
     })
     test("Then bills should be ordered from earliest to latest", () => {
