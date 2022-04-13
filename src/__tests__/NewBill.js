@@ -4,23 +4,15 @@
 
 import { screen,
   fireEvent,
-  getByTestId,
-  getByLabelText,
-  getAllByText,
-  getAllByPlaceholderText,
-  getByText,
-  getByRole } from "@testing-library/dom"
+  getByTestId,} from "@testing-library/dom"
 import '@testing-library/jest-dom'
 import NewBillUI from "../views/NewBillUI.js"//added
 import NewBill from "../containers/NewBill.js"
-import Router from "../app/Router.js"//added
 import store from "../__mocks__/store.js"//added
-import {ROUTES , ROUTES_PATH} from '../constants/routes.js'
+import {ROUTES} from '../constants/routes.js'
 import {localStorageMock } from '../__mocks__/localStorage.js'
 import userEvent from "@testing-library/user-event" 
-import Bills from "../containers/Bills.js"
-import { event } from "jquery"
-import BillsUI from '../views/BillsUI.js'
+
 
 
 
@@ -28,26 +20,27 @@ import BillsUI from '../views/BillsUI.js'
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page", () => {
 
+    //Test pour savoir si, quand je suis sur newBill, le formulaire est bien présent dans le html grâce à l'id 'form-new-bill'
     it("Then I am on newBillPage and the form is present", () => {         
       const html = NewBillUI()
       document.body.innerHTML = html
       expect(getByTestId(document.body,'form-new-bill')).toBeTruthy()
     })   
-
-    it("Then i amm on newBillPAge the field type de dépense proposes Transport by default ",()=>{
+    //Test pour savoir si, quand je suis sur newBill, le texte "Transports" dans le champ de saisie est bien présent
+    it("Then I am on newBillPAge the field type de dépense proposes Transport by default ",()=>{
       const html = NewBillUI()
       document.body.innerHTML = html
       expect(screen.getAllByText('Transports')).toBeTruthy()
     })
-
-    it("Then i am on newBillPage the field type nom de la dépense proposes vol Paris Londres by default",()=>{
+    //Test pour savoir si, quand je suis sur newBill, le texte "Vol Paris Londres" dans le champ de saisie est bien présent
+    it("Then I am on newBillPage the field type nom de la dépense proposes vol Paris Londres by default",()=>{
       const html = NewBillUI()
       document.body.innerHTML = html
       expect(screen.getByPlaceholderText('Vol Paris Londres')).toBeTruthy()
 
     })
-    
-    it('Then i am on newBillPage and i click on select btn type de dépense, several choice are available',()=>{
+    //Test pour savoir si, quand je suis sur newBill et que je clique sur le bouton 'expense-type', toutes les propositions Transports/Restaurants et bars/Hôtel et logement/Services en ligne/IT et électronique/Equipement et matériel/Fournitures de bureau sont bien présentes
+    it('Then I am on newBillPage and I click on select btn type de dépense, several choice are available',()=>{
       const html = NewBillUI()
       document.body.innerHTML = html
       userEvent.click(getByTestId(document.body,'expense-type'))
@@ -60,7 +53,7 @@ describe("Given I am connected as an employee", () => {
       expect(screen.getAllByText('Fournitures de bureau')).toBeTruthy()
     })
 
-    // NewBill tests
+    // NewBill tests pour vérifie si la class newBill est bien définie (et non undefined)
     it('Then  NewBill Class is defined',()=>{    
       const html = NewBillUI()
       document.body.innerHTML = html
@@ -120,74 +113,40 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page and I submit the form width an image (jpg, jpeg, png)", () => {
     test("Then it should create a new bill", () => {
       const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname });
+        document.body.innerHTML = ROUTES({ pathname });//récupère le pathname de l'url comme étant '#employee/bill/new' dans la variable onNavigate
       };
       Object.defineProperty(window, "localStorage", {
-        value: localStorageMock,
+        value: localStorageMock,//récupère localStorageMock depuis le fichier localStorage.js
       });
-      window.localStorage.setItem(
+      window.localStorage.setItem(// défini le user en tant qu'employé dans le local storage
         "user",
         JSON.stringify({
           type: "Employee",
         })
       );
-      const firestore = null;
-      const html = NewBillUI();
-      document.body.innerHTML = html;
+      const firestore = null;//défini comme null
+      const html = NewBillUI();//récupère le DOM de newBill dans html 
+      document.body.innerHTML = html;//transèfere vers document.body.innerHTML
 
-      const newBill = new NewBill({
+      const newBill = new NewBill({//variable créée à partir d'un neo newBill avec ses paramètres
         document,
         onNavigate,
         firestore,
         localStorage: window.localStorage,
       });
-      const handleSubmit = jest.fn(newBill.handleSubmit);
-      const submitBtn = screen.getByTestId("form-new-bill");
-      submitBtn.addEventListener("submit", handleSubmit);
-      fireEvent.submit(submitBtn);
-      expect(handleSubmit).toHaveBeenCalled();
+      const handleSubmit = jest.fn(newBill.handleSubmit);//The jest. fn method allows us to create a new mock function directly. If you are mocking an object method, you can use jest.
+      const submitBtn = screen.getByTestId("form-new-bill");//form-new-bill dans variable submitBtn
+      submitBtn.addEventListener("submit", handleSubmit);//si form submitted, lancer handleSubmit
+      fireEvent.submit(submitBtn);//créer un évent click et dispatche cet évent sur le DOM node en paramètre
+      expect(handleSubmit).toHaveBeenCalled();//Vérifie que handleSubmit a été appelée
     });
   });
 });
 
-describe("Given I am connected as an employee", () => {
-  describe("When I am on NewBill Page and I submit the form width an image (jpg, jpeg, png)", () => {
-    test("Then it should create a new bill", () => {
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname });
-      };
-      Object.defineProperty(window, "localStorage", {
-        value: localStorageMock,
-      });
-      window.localStorage.setItem(
-        "user",
-        JSON.stringify({
-          type: "Employee",
-        })
-      );
-      const firestore = null;
-      const html = NewBillUI();
-      document.body.innerHTML = html;
-
-      const newBill = new NewBill({
-        document,
-        onNavigate,
-        firestore,
-        localStorage: window.localStorage,
-      });
-      const handleSubmit = jest.fn(newBill.handleSubmit);
-      const submitBtn = screen.getByTestId("form-new-bill");
-      submitBtn.addEventListener("submit", handleSubmit);
-      fireEvent.submit(submitBtn);
-      expect(handleSubmit).toHaveBeenCalled();
-    });
-  });
-});
-
-// test d'intégration POST
+// Test d'intégration POST
 describe("When I navigate in Bills page", () => {
   test("fetches bills from mock API Post", async () => {
-      const newBill = {
+      const newBill = {//variable avec fake valeurs pour simuler une new bill submitted
         "id": "qcCK3SzECmaZAGRrHjaC",
         "status": "refused",
         "pct": 20,
@@ -203,13 +162,13 @@ describe("When I navigate in Bills page", () => {
         "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=4df6ed2c-12c8-42a2-b013-346c1346f732"
       }
    
-             const getSpy = jest.spyOn(store, "post")
-             const bills = await store.post(newBill) 
-             const addBill = [...bills.data, newBill]
-             expect(getSpy).toHaveBeenCalledTimes(1)
-             expect(addBill.length).toBe(5)
-             expect(addBill[4].name).toBe("test8")
-            
-          })
+        const getSpy = jest.spyOn(store, "post")// fonction simulée qui surveille l'appel de la méthode POST de l'objet store mocké
+        const bills = await store.post(newBill) //envoie les données vers le store mocké
+        const addBill = [...bills.data, newBill]//ajout de la new bill dans le tableau/html/DOM
+        expect(getSpy).toHaveBeenCalledTimes(1)//vérifie que getSpy a bien été appelée 1 fois
+        expect(addBill.length).toBe(5)//vérifie que la taille de la new bill ajoutée est bien de 5 (pour les 5 colonnes type, nom, date, montant, statut, actions)
+        expect(addBill[4].name).toBe("test8")//vérifie que le nom de la new bill est bien "test8"
+      
+    })
   
 }); 
