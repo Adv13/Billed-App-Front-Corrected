@@ -176,7 +176,7 @@ export default class {
       this.counter ++
     }
 
-    /////////////// BUG HUNT DASHBOARD SOLVED ////////////////
+    /////////////// BUG HUNT DASHBOARD SOLVED HERE ////////////////
     bills.forEach(bill => {
       // $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
       $(`#open-bill${bill.id}`,` #status-bills-container${this.index} `).click((e) => {//modifié pour afficher le contenu de chaque facture

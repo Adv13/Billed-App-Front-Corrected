@@ -48,6 +48,8 @@ export default ({ data: bills, loading, error }) => {
     return ErrorPage(error)
   }
   
+  /***************************** [Bug report] - Bills HERE ***********************************/
+
   //pour afficher les factures en ordre décroissant
   let sortedBills 
   if (bills) {
@@ -55,7 +57,7 @@ export default ({ data: bills, loading, error }) => {
   }
 
   bills.forEach(element => {
-    console.log(element.date);
+    console.log(element.date);//vérifie l'ordre décroissant des dates dans la console
   });
 
   return (`
